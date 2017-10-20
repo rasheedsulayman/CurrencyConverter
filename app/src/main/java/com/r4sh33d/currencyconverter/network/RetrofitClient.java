@@ -11,8 +11,10 @@ public class RetrofitClient {
 
 
     public static final String baseUrl = "https://min-api.cryptocompare.com/data/pricemulti";
-    public  static  final String CRYPTOCURRENCIES_TO_CONVERT_FROM = "ETH,BTC";
+    public  static  final String CRYPTOCURRENCIES_TO_CONVERT_FROM = "BTC,ETH";
     public static final String COUNTRYCURRENCIES_TO_CONVERT_TO = "";
+
+
 
     private static Retrofit retrofit = null;
 

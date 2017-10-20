@@ -9,9 +9,9 @@ public class Currency  {
     String countryShortCode;
     double btcEquivalent;
     double ethEquivalent;
-    boolean isActivated;
+    int isActivated;
 
-    public Currency(String countryName, String countryShortCode, double btcEquivalent, double ethEquivalent, boolean isActivated) {
+    public Currency(String countryName, String countryShortCode, double btcEquivalent, double ethEquivalent, int isActivated) {
         this.countryName = countryName;
         this.countryShortCode = countryShortCode;
         this.btcEquivalent = btcEquivalent;
