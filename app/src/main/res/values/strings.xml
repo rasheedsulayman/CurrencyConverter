@@ -1,3 +1,52 @@
 <resources>
     <string name="app_name">Currency Converter</string>
+    <string-array name="country_names">
+        <item>Nigeria</item>
+        <item>United States</item>
+        <item>United Kingdom</item>
+        <item>South Korea</item>
+        <item>India</item>
+        <item>Saudi Arabia</item>
+        <item>Euro Member Countries</item>
+        <item>United Arab Emirates</item>
+        <item>Egypt</item>
+        <item>Ghana</item>
+        <item>Kuwait</item>
+        <item>Canada</item>
+        <item>Qatar</item>
+        <item>Brazil</item>
+        <item>Israel</item>
+        <item>Kenya</item>
+        <item>Russia</item>
+        <item>South Africa</item>
+        <item>China</item>
+        <item>Japan</item>
+
+
+    </string-array>
+
+    <string-array name="country_short_codes">
+        <item>NGN</item>
+        <item>USD</item>
+        <item>GBP</item>
+        <item>KRW</item>
+        <item>INR</item>
+        <item>SAR</item>
+        <item>EUR</item>
+        <item>AED</item>
+        <item>EGP</item>
+        <item>GHS</item>
+        <item>KWD</item>
+        <item>CAD</item>
+        <item>QAR</item>
+        <item>BRL</item>
+        <item>ILS</item>
+        <item>KES</item>
+        <item>RUB</item>
+        <item>ZAR</item>
+        <item>CNY</item>
+        <item>JPY</item>
+
+
+    </string-array>
 </resources>
