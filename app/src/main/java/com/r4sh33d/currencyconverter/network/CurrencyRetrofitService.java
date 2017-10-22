@@ -1,7 +1,5 @@
 package com.r4sh33d.currencyconverter.network;
 
-import com.google.gson.JsonObject;
-
 import retrofit2.Call;
 import retrofit2.http.GET;
 import retrofit2.http.Path;
@@ -14,8 +12,8 @@ import retrofit2.http.Query;
 public interface CurrencyRetrofitService {
 
 
-    @GET("")
-   public Call<JsonObject> getConVersionRates(@Query("fsyms") String fromSys , @Query("tsyms") String toSys);
+    @GET("data/pricemulti")
+   public Call<String> getConVersionRates(@Query("fsyms") String fromSys , @Query("tsyms") String toSys);
 
 
 

@@ -11,7 +11,7 @@ import android.database.sqlite.SQLiteOpenHelper;
 public class CurrencyDBHelper extends SQLiteOpenHelper {
 
     public static final int DATABASE_VERSION = 1;
-    public static final String DATABASE_NAME = "FeedReader.db";
+    public static final String DATABASE_NAME = "currency.db";
 
     private static final String SQL_CREATE_ENTRIES =
             "CREATE TABLE " + CurrencyContract.TABLE_NAME + " (" +
@@ -20,6 +20,7 @@ public class CurrencyDBHelper extends SQLiteOpenHelper {
                     CurrencyContract.COLUMN_COUNTRY_SHORT_CODE + " TEXT," +
                     CurrencyContract.COLUMN_BTC_EQUIVALENT + " DOUBLE," +
                     CurrencyContract.COLUMN_ETH_EQUIVALENT + " DOUBLE," +
+                    CurrencyContract.COLUMN_DIALOG_LABEL + " TEXT," +
                     CurrencyContract.COLUMN_IS_ENABLED + " BOOLEAN)";
 
     private static final String SQL_DELETE_ENTRIES =

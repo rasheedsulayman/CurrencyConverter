@@ -2,13 +2,17 @@ package com.r4sh33d.currencyconverter;
 
 import android.content.Context;
 import android.support.v7.widget.RecyclerView;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
 /**
+ *
  * Created by r4sh33d on 10/20/17.
+ *
  */
 
 public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapter.MyHolder> {
@@ -24,11 +28,17 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
 
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        return null;
+        View view = LayoutInflater.from(context).inflate(R.layout.item_currency_list , parent , false);
+        return new MyHolder(view);
     }
 
     @Override
     public void onBindViewHolder(MyHolder holder, int position) {
+        Currency currency = currencyArrayList.get(position);
+        holder.countryNameTv.setText("Country Name :"+currency.countryName);
+        holder.countryExchangeCodeTv.setText("Currency shortcode :"+currency.countryShortCode);
+        holder.oneBtcEquivalentTV.setText("One btc equivalent :"+String.valueOf(currency.btcEquivalent));
+        holder.oneEthEquivalentBc.setText("One Eth equivalent :"+String.valueOf(currency.ethEquivalent));
 
     }
 
@@ -37,10 +47,15 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
         return currencyArrayList.size();
     }
 
-    class  MyHolder extends  RecyclerView.ViewHolder{
-
+    class MyHolder extends RecyclerView.ViewHolder {
+        TextView countryNameTv, countryExchangeCodeTv, oneBtcEquivalentTV, oneEthEquivalentBc;
         public MyHolder(View itemView) {
             super(itemView);
+            countryNameTv = (TextView) itemView.findViewById(R.id.textView);
+            countryExchangeCodeTv = (TextView) itemView.findViewById(R.id.textView2);
+            oneBtcEquivalentTV = (TextView) itemView.findViewById(R.id.textView3);
+            oneEthEquivalentBc = (TextView) itemView.findViewById(R.id.textView4);
+
         }
     }
 }

@@ -15,9 +15,7 @@ public class CurrencyContract implements BaseColumns{
     public  static final String COLUMN_ETH_EQUIVALENT = "eth_equivalent";
     public  static final String COLUMN_IS_ENABLED = "is_enabled";
 
-
-
-
+    public static final String COLUMN_DIALOG_LABEL = "dialog_label";
 }
 
 
