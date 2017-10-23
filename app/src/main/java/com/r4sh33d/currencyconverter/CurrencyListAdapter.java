@@ -1,6 +1,7 @@
 package com.r4sh33d.currencyconverter;
 
 import android.content.Context;
+import android.content.Intent;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -37,8 +38,8 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
         Currency currency = currencyArrayList.get(position);
         holder.countryNameTv.setText("Country Name :"+currency.countryName);
         holder.countryExchangeCodeTv.setText("Currency shortcode :"+currency.countryShortCode);
-        holder.oneBtcEquivalentTV.setText("One btc equivalent :"+String.valueOf(currency.btcEquivalent));
-        holder.oneEthEquivalentBc.setText("One Eth equivalent :"+String.valueOf(currency.ethEquivalent));
+        holder.oneBtcEquivalentTV.setText("One btc equivalent :"+String.valueOf(currency.oneBtcEquivalent));
+        holder.oneEthEquivalentBc.setText("One Eth equivalent :"+String.valueOf(currency.oneEthEquivalent));
 
     }
 
@@ -47,7 +48,7 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
         return currencyArrayList.size();
     }
 
-    class MyHolder extends RecyclerView.ViewHolder {
+    class MyHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         TextView countryNameTv, countryExchangeCodeTv, oneBtcEquivalentTV, oneEthEquivalentBc;
         public MyHolder(View itemView) {
             super(itemView);
@@ -55,7 +56,17 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
             countryExchangeCodeTv = (TextView) itemView.findViewById(R.id.textView2);
             oneBtcEquivalentTV = (TextView) itemView.findViewById(R.id.textView3);
             oneEthEquivalentBc = (TextView) itemView.findViewById(R.id.textView4);
+            itemView.setOnClickListener(this);
 
         }
+
+        @Override
+        public void onClick(View v) {
+            Intent intent = new Intent(context , ConversionActivity.class);
+            intent.putExtra(Utils.CURRENCY_INTENT_KEY , currencyArrayList.get(getAdapterPosition()));
+            context.startActivity(intent);
+        }
     }
+
+
 }

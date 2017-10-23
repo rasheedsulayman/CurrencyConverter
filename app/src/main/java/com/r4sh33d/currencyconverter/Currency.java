@@ -10,23 +10,23 @@ import android.os.Parcelable;
 public class Currency implements Parcelable {
     String countryName;
     String countryShortCode;
-    double btcEquivalent;
-    double ethEquivalent;
+    double oneBtcEquivalent;
+    double oneEthEquivalent;
     int isActivated;
 
     public Currency(String countryName, String countryShortCode, double btcEquivalent, double ethEquivalent, int isActivated) {
         this.countryName = countryName;
         this.countryShortCode = countryShortCode;
-        this.btcEquivalent = btcEquivalent;
-        this.ethEquivalent = ethEquivalent;
+        this.oneBtcEquivalent = btcEquivalent;
+        this.oneEthEquivalent = ethEquivalent;
         this.isActivated = isActivated;
     }
 
     protected Currency(Parcel in) {
         countryName = in.readString();
         countryShortCode = in.readString();
-        btcEquivalent = in.readDouble();
-        ethEquivalent = in.readDouble();
+        oneBtcEquivalent = in.readDouble();
+        oneEthEquivalent = in.readDouble();
         isActivated = in.readInt();
     }
 
@@ -47,8 +47,8 @@ public class Currency implements Parcelable {
         return "Currency{" +
                 "countryName='" + countryName + '\'' +
                 ", countryShortCode='" + countryShortCode + '\'' +
-                ", btcEquivalent=" + btcEquivalent +
-                ", ethEquivalent=" + ethEquivalent +
+                ", btcEquivalent=" + oneBtcEquivalent +
+                ", ethEquivalent=" + oneEthEquivalent +
                 ", isActivated=" + isActivated +
                 '}';
     }
@@ -62,8 +62,8 @@ public class Currency implements Parcelable {
     public void writeToParcel(Parcel dest, int flags) {
         dest.writeString(countryName);
         dest.writeString(countryShortCode);
-        dest.writeDouble(btcEquivalent);
-        dest.writeDouble(ethEquivalent);
+        dest.writeDouble(oneBtcEquivalent);
+        dest.writeDouble(oneEthEquivalent);
         dest.writeInt(isActivated);
     }
 }

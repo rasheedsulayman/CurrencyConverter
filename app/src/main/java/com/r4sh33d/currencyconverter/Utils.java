@@ -17,9 +17,10 @@ public class Utils {
 
 
     private static final String TAG = "debugtag";
+    public static String CURRENCY_INTENT_KEY = "currency_intent_key";
 
-    public static void logMessage(String message){
-        Log.d(TAG , message);
+    public static void logMessage(String message) {
+        Log.d(TAG, message);
     }
 
     public static ArrayList<Currency> getCurrencciesFromCursor(Cursor cursor) {
@@ -31,7 +32,7 @@ public class Utils {
         int btcEquivIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_BTC_EQUIVALENT);
         int ethEquivIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_ETH_EQUIVALENT);
         int isEnabledIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_IS_ENABLED);
-         logMessage("cursor == null " + (cursor == null));
+        logMessage("cursor == null " + (cursor == null));
         if ((cursor != null) && (cursor.moveToFirst()))
             do {
                 arrayList.add(new Currency(
@@ -49,6 +50,32 @@ public class Utils {
         return arrayList;
 
     }
+
+    public static Cursor makeCreateCardDialogCursor(SQLiteDatabase database) {
+
+        String[] projection = {
+                CurrencyContract._ID,
+                CurrencyContract.COLUMN_DIALOG_LABEL,
+                CurrencyContract.COLUMN_IS_ENABLED
+        };
+
+
+        Cursor cursor = database.query(
+                CurrencyContract.TABLE_NAME,                     // The table to query
+                projection,                               // The columns to return
+                null,                                // The columns for the WHERE clause
+                null,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,
+                null // don't filter by row groups
+        );
+
+        DatabaseUtils.dumpCursor(cursor);
+        return cursor;
+
+    }
+
+
 
     public static Cursor makeConversionRatesCursor(SQLiteDatabase database) {
 

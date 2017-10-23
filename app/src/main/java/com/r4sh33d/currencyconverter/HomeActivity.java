@@ -53,7 +53,6 @@ public class HomeActivity extends AppCompatActivity {
                 setUpDialog();
             }
         });
-
     }
 
 
@@ -61,56 +60,90 @@ public class HomeActivity extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final ArrayList<Integer> selectedItems = new ArrayList<>();  // Where we track the selected items
         final HashMap<Integer, Boolean> selectedItemsMap = new HashMap<>();
-        //SparseBooleanArray sparse = new SparseBooleanArray(10);
-
-        builder.setMultiChoiceItems(Utils.makeConversionRatesCursor(database), CurrencyContract.COLUMN_IS_ENABLED,
+        final ArrayList<Integer> desabledItems = new ArrayList<>();
+        builder.setMultiChoiceItems(Utils.makeCreateCardDialogCursor(database), CurrencyContract.COLUMN_IS_ENABLED,
                 CurrencyContract.COLUMN_DIALOG_LABEL, new DialogInterface.OnMultiChoiceClickListener() {
-
                     @Override
                     public void onClick(DialogInterface dialog, int which, boolean isChecked) {
                         Toast.makeText(HomeActivity.this, "Item clicked which is " + which
                                 + " isChecked " + isChecked, Toast.LENGTH_SHORT).show();
 
-                        selectedItemsMap.put(which, isChecked);
-
-
+                        if (isChecked) {
+                            if (desabledItems.contains(which)) {
+                                desabledItems.remove(Integer.valueOf(which));
+                            }
+                            selectedItems.add(which);
+                        } else {
+                            if (selectedItems.contains(which)) {
+                                selectedItems.remove(Integer.valueOf(which));
+                            }
+                            desabledItems.add(which);
+                        }
                     }
                 }).setPositiveButton("Create", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
+                Utils.logMessage("seleced items " + selectedItems);
+                Utils.logMessage("Disabled items " + desabledItems);
+                if (selectedItems.size() > 0) {
+                    updateCheckedRows(selectedItems);
+                }
+                if (desabledItems.size() > 0) {
+                    updateUncheckedRows(desabledItems);
 
-                // New value for one column
-                ContentValues values = new ContentValues();
-                //  values.put(FeedEntry.COLUMN_NAME_TITLE, title);
+                }
 
-                //Which row to update, based on the title
-                String selection = CurrencyContract._ID + " IN (" + makePlaceholders(selectedItemsMap.size()) + ")";
-                String[] selectionArgs = makeDbPlaceHolderFromIds(selectedItemsMap);
-                int count = database.update(
-                        CurrencyContract.TABLE_NAME,
-                        values,
-                        selection,
-                        selectionArgs);
+
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
 
             }
-        }).create().show();
+        }).setTitle("Create Conversion Cards").create().show();
+    }
+
+    void updateCheckedRows(ArrayList<Integer> rowsToUpdate) {
+        ContentValues values = new ContentValues();
+        values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
+
+        String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
+        String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
+        int count = database.update(
+                CurrencyContract.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+        Utils.logMessage("Succesully updated " + count + " rows ");
+    }
+
+    void updateUncheckedRows(ArrayList<Integer> rowsToUpdate) {
+        ContentValues values = new ContentValues();
+        values.put(CurrencyContract.COLUMN_IS_ENABLED, 0);
+
+        String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
+        String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
+        int count = database.update(
+                CurrencyContract.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+        Utils.logMessage("Succesully updated " + count + " rows ");
+
     }
 
 
-    String[] makeDbPlaceHolderFromIds(HashMap<Integer, Boolean> map) {
-        ArrayList<String> arrayList = new ArrayList<>();
-        for (int i : map.keySet()) {
-            arrayList.add(String.valueOf(i));
-        }
+    String[] makeDbPlaceHolderFromIds(ArrayList<Integer> arrayList) {
         String[] toReturn = new String[arrayList.size()];
-        return arrayList.toArray(toReturn);
+        for (int i = 0; i < toReturn.length; i++) {
+            toReturn[i] = String.valueOf(arrayList.get(i));
+        }
+        return toReturn;
     }
+
 
     String makePlaceholders(int len) {
+        Utils.logMessage("The length in makePlaceHolder is " + len);
         if (len < 1) {
             // It will lead to an invalid query anyway ..
             throw new RuntimeException("No placeholders");
