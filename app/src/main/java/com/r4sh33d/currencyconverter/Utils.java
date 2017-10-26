@@ -1,8 +1,12 @@
 package com.r4sh33d.currencyconverter;
 
+import android.content.ContentValues;
+import android.content.Context;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.r4sh33d.currencyconverter.database.CurrencyContract;
@@ -61,11 +65,11 @@ public class Utils {
 
 
         Cursor cursor = database.query(
-                CurrencyContract.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
+                CurrencyContract.TABLE_NAME,
+                projection,
+                null,
+                null,
+                null,
                 null,
                 null // don't filter by row groups
         );
@@ -74,7 +78,6 @@ public class Utils {
         return cursor;
 
     }
-
 
 
     public static Cursor makeConversionRatesCursor(SQLiteDatabase database) {
@@ -92,9 +95,9 @@ public class Utils {
         };
 
         // Filter results WHERE "title" = 'My Title'
-/*        String selection = CurrencyContract.COLUMN_IS_ENABLED
+        String selection = CurrencyContract.COLUMN_IS_ENABLED
                 + " = ?";
-        String[] selectionArgs = {"1"};*/
+        String[] selectionArgs = {"1"};
 
         // How you want the results sorted in the resulting Cursor
 
@@ -102,8 +105,8 @@ public class Utils {
         Cursor cursor = database.query(
                 CurrencyContract.TABLE_NAME,                     // The table to query
                 projection,                               // The columns to return
-                null,                                // The columns for the WHERE clause
-                null,                            // The values for the WHERE clause
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
                 null,                                     // don't group the rows
                 null,
                 null // don't filter by row groups
@@ -114,4 +117,65 @@ public class Utils {
 
     }
 
+    public static boolean isDeviceConnected(Context context) {
+        ConnectivityManager cm =
+                (ConnectivityManager) context.getSystemService(Context.CONNECTIVITY_SERVICE);
+        NetworkInfo netInfo = cm.getActiveNetworkInfo();
+        return netInfo != null && netInfo.isConnectedOrConnecting();
+    }
+
+
+    static void updateCheckedRows(ArrayList<Integer> rowsToUpdate, SQLiteDatabase database) {
+        ContentValues values = new ContentValues();
+        values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
+
+        String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
+        String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
+        int count = database.update(
+                CurrencyContract.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+        Utils.logMessage("Succesully updated " + count + " rows ");
+    }
+
+    static void updateUncheckedRows(ArrayList<Integer> rowsToUpdate, SQLiteDatabase database) {
+        ContentValues values = new ContentValues();
+        values.put(CurrencyContract.COLUMN_IS_ENABLED, 0);
+
+        String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
+        String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
+        int count = database.update(
+                CurrencyContract.TABLE_NAME,
+                values,
+                selection,
+                selectionArgs);
+        Utils.logMessage("Successfully updated " + count + " rows ");
+
+    }
+
+
+    public static String[] makeDbPlaceHolderFromIds(ArrayList<Integer> arrayList) {
+        String[] toReturn = new String[arrayList.size()];
+        for (int i = 0; i < toReturn.length; i++) {
+            toReturn[i] = String.valueOf(arrayList.get(i));
+        }
+        return toReturn;
+    }
+
+
+    public static String makePlaceholders(int len) {
+        Utils.logMessage("The length in makePlaceHolder is " + len);
+        if (len < 1) {
+            // It will lead to an invalid query anyway ..
+            throw new RuntimeException("No placeholders");
+        } else {
+            StringBuilder sb = new StringBuilder(len * 2 - 1);
+            sb.append("?");
+            for (int i = 1; i < len; i++) {
+                sb.append(",?");
+            }
+            return sb.toString();
+        }
+    }
 }

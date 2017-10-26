@@ -1,10 +1,13 @@
 package com.r4sh33d.currencyconverter;
 
+import android.app.ProgressDialog;
 import android.content.ContentValues;
 import android.content.DialogInterface;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
+import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
@@ -34,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
     CurrencyDBHelper currencyDBHelper;
     SQLiteDatabase database;
     ArrayList<Currency> currencyArrayList = new ArrayList<>();
+    CoordinatorLayout coordinatorLayout;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -41,26 +45,34 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         fab = (FloatingActionButton) findViewById(R.id.fabAddCurrency);
+        coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         currencyListAdapter = new CurrencyListAdapter(this, currencyArrayList);
         recyclerView.setAdapter(currencyListAdapter);
         currencyDBHelper = new CurrencyDBHelper(this);
         database = currencyDBHelper.getWritableDatabase();
-        getConversionRatesFromServer();
+
+        if (!Utils.isDeviceConnected(this)) {
+            //load the last requested conversions from database
+            refreshRecyclerViewItems();
+        } else {
+            //we have internet connection , load an up-to-date conversions from the  server
+            getConversionRatesFromServer();
+        }
+
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setUpDialog();
+                setUpCreateCardDialog();
             }
         });
     }
 
 
-    void setUpDialog() {
+    void setUpCreateCardDialog() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         final ArrayList<Integer> selectedItems = new ArrayList<>();  // Where we track the selected items
-        final HashMap<Integer, Boolean> selectedItemsMap = new HashMap<>();
-        final ArrayList<Integer> desabledItems = new ArrayList<>();
+        final ArrayList<Integer> desabledItems = new ArrayList<>(); // Where we keep track of disabled items
         builder.setMultiChoiceItems(Utils.makeCreateCardDialogCursor(database), CurrencyContract.COLUMN_IS_ENABLED,
                 CurrencyContract.COLUMN_DIALOG_LABEL, new DialogInterface.OnMultiChoiceClickListener() {
                     @Override
@@ -86,14 +98,12 @@ public class HomeActivity extends AppCompatActivity {
                 Utils.logMessage("seleced items " + selectedItems);
                 Utils.logMessage("Disabled items " + desabledItems);
                 if (selectedItems.size() > 0) {
-                    updateCheckedRows(selectedItems);
+                    Utils.updateCheckedRows(selectedItems, database);
                 }
                 if (desabledItems.size() > 0) {
-                    updateUncheckedRows(desabledItems);
+                    Utils.updateUncheckedRows(desabledItems, database);
 
                 }
-
-
             }
         }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
             @Override
@@ -103,63 +113,15 @@ public class HomeActivity extends AppCompatActivity {
         }).setTitle("Create Conversion Cards").create().show();
     }
 
-    void updateCheckedRows(ArrayList<Integer> rowsToUpdate) {
-        ContentValues values = new ContentValues();
-        values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
-
-        String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
-        String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
-        int count = database.update(
-                CurrencyContract.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
-        Utils.logMessage("Succesully updated " + count + " rows ");
-    }
-
-    void updateUncheckedRows(ArrayList<Integer> rowsToUpdate) {
-        ContentValues values = new ContentValues();
-        values.put(CurrencyContract.COLUMN_IS_ENABLED, 0);
-
-        String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
-        String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
-        int count = database.update(
-                CurrencyContract.TABLE_NAME,
-                values,
-                selection,
-                selectionArgs);
-        Utils.logMessage("Succesully updated " + count + " rows ");
-
-    }
-
-
-    String[] makeDbPlaceHolderFromIds(ArrayList<Integer> arrayList) {
-        String[] toReturn = new String[arrayList.size()];
-        for (int i = 0; i < toReturn.length; i++) {
-            toReturn[i] = String.valueOf(arrayList.get(i));
-        }
-        return toReturn;
-    }
-
-
-    String makePlaceholders(int len) {
-        Utils.logMessage("The length in makePlaceHolder is " + len);
-        if (len < 1) {
-            // It will lead to an invalid query anyway ..
-            throw new RuntimeException("No placeholders");
-        } else {
-            StringBuilder sb = new StringBuilder(len * 2 - 1);
-            sb.append("?");
-            for (int i = 1; i < len; i++) {
-                sb.append(",?");
-            }
-            return sb.toString();
-        }
-    }
 
     void getConversionRatesFromServer() {
         Utils.logMessage("getConversionRatesFromServer called");
-
+        final ProgressDialog dialog = new ProgressDialog(this);
+        dialog.setIndeterminate(true);
+        dialog.setMessage("Loading up to date conversion ratio from the server ,  Please wait...");
+        dialog.setCancelable(false);
+        dialog.setCanceledOnTouchOutside(false);
+        dialog.show();
         CurrencyRetrofitService currencyRetrofitService = RetrofitClient.getClient().create(CurrencyRetrofitService.class);
         Call<String> call = currencyRetrofitService.getConVersionRates(RetrofitClient.CRYPTOCURRENCIES_TO_CONVERT_FROM,
                 buildCountryCurrencyParams());
@@ -168,8 +130,8 @@ public class HomeActivity extends AppCompatActivity {
             public void onResponse(Call<String> call, Response<String> response) {
                 Utils.logMessage("onResponse called with " + response.body());
                 Toast.makeText(HomeActivity.this, "onResponse called with ", Toast.LENGTH_SHORT).show();
-
                 database = currencyDBHelper.getWritableDatabase();
+                database.delete(CurrencyContract.TABLE_NAME, null, null);
                 JsonObject jsonObject = new JsonParser().parse(response.body()).getAsJsonObject();
                 Set<String> shortCodeskeySet = jsonObject.getAsJsonObject("BTC").keySet();
                 HashMap<String, String> countryCodeMap = getCountryIsoCodeMap();
@@ -186,14 +148,21 @@ public class HomeActivity extends AppCompatActivity {
                     Utils.logMessage("row inserted with id " + id);
 
                 }
-
+                dialog.dismiss();
                 refreshRecyclerViewItems();
 
             }
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                Toast.makeText(HomeActivity.this, "Network call failed", Toast.LENGTH_SHORT).show();
+                t.printStackTrace();
+                Snackbar.make(coordinatorLayout, "Network connection error...", Snackbar.LENGTH_INDEFINITE)
+                        .setAction("Retry", new View.OnClickListener() {
+                            @Override
+                            public void onClick(View v) {
+                                getConversionRatesFromServer();
+                            }
+                        });
             }
         });
     }
@@ -216,8 +185,6 @@ public class HomeActivity extends AppCompatActivity {
             codeCountryMap.put(arrayOfCurrencyShortCodes[i], arrayOfCOuntryNames[i]);
         }
         return codeCountryMap;
-
-
     }
 
 
@@ -230,5 +197,12 @@ public class HomeActivity extends AppCompatActivity {
         }
         result = stringBuilder.toString();
         return result.substring(0, result.length() - 1);
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        database.close();
     }
 }
