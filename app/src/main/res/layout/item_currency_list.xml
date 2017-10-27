@@ -1,54 +1,165 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.v7.widget.CardView android:layout_width="match_parent"
-    android:layout_margin="4dp"
-    android:layout_height="wrap_content"
-    app:cardCornerRadius="4dp"
-    android:elevation="3dp"
+<android.support.v7.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:android="http://schemas.android.com/apk/res/android" >
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp"
+    android:elevation="3dp"
+    app:cardCornerRadius="4dp">
 
-    <RelativeLayout
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_height="wrap_content"
+        android:orientation="vertical">
 
         <TextView
-            android:layout_marginLeft="6dp"
-            android:id="@+id/textView"
+            android:id="@+id/headerText"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_alignParentLeft="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="TextView" />
+            android:layout_gravity="center_horizontal"
+            android:text="Header"
+            android:textColor="@android:color/black"
+            android:textSize="18dp" />
 
-        <TextView
-            android:layout_marginLeft="6dp"
+        <RelativeLayout
 
-            android:id="@+id/textView2"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView"
-            android:layout_marginTop="6dp"
-            android:text="TextView" />
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content">
 
-        <TextView
-            android:layout_marginLeft="6dp"
+            <ImageView
+                android:padding="10dp"
+                android:id="@+id/imageViewFlag"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:layout_centerVertical="true"
+                android:layout_margin="8dp"
+                android:src="@drawable/nigeria"
 
-            android:id="@+id/textView3"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView2"
-            android:layout_marginTop="6dp"
-            android:text="TextView" />
+                />
 
-        <TextView
-            android:layout_marginLeft="6dp"
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_toRightOf="@id/imageViewFlag"
+                android:orientation="vertical">
 
-            android:id="@+id/textView4"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@+id/textView3"
-            android:layout_marginTop="6dp"
-            android:text="TextView" />
-    </RelativeLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="10dp"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:paddingTop="3dp"
+                        android:layout_width="20dp"
+                       android:scaleType="fitCenter"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="6dp"
+                        android:src="@drawable/bitcoin_logo" />
+
+                    <TextView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+
+                        android:layout_marginRight="4dp"
+                        android:text="1"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+                    <ImageView
+                        android:layout_width="50dp"
+
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="4dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_trending_flat_black_24dp" />
+
+                    <ImageView
+                        android:id="@+id/currencySymbol1"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/nigeria_naira_currency_symbol" />
+
+                    <TextView
+                        android:id="@+id/btcEquivalent"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="2000"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal">
+
+                    <ImageView
+                        android:layout_width="20dp"
+                          android:paddingTop="3dp"
+                        android:scaleType="fitCenter"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="6dp"
+                        android:src="@drawable/eth_symbol" />
+
+                    <TextView
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="4dp"
+                        android:text="1"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+                    <ImageView
+                        android:layout_width="50dp"
+
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:layout_marginRight="4dp"
+                        android:scaleType="fitCenter"
+                        android:src="@drawable/ic_trending_flat_black_24dp" />
+
+                    <ImageView
+                        android:id="@+id/currencySymbol2"
+                        android:layout_width="20dp"
+                        android:layout_height="20dp"
+                        android:layout_gravity="center_vertical"
+
+                        android:layout_marginRight="10dp"
+                        android:src="@drawable/nigeria_naira_currency_symbol" />
+
+                    <TextView
+                        android:id="@+id/ethEquivalentTv"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_gravity="center_vertical"
+                        android:text="2000"
+                        android:textColor="@android:color/black"
+                        android:textSize="20sp" />
+
+
+                </LinearLayout>
+
+
+            </LinearLayout>
+
+
+        </RelativeLayout>
+
+
+    </LinearLayout>
 </android.support.v7.widget.CardView>
+
+

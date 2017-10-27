@@ -1,4 +1,27 @@
 <resources>
+    <string-array name="country_short_codes">
+        <item>NGN</item>
+        <item>USD</item>
+        <item>GBP</item>
+        <item>KRW</item>
+        <item>INR</item>
+        <item>SAR</item>
+        <item>EUR</item>
+        <item>AED</item>
+        <item>EGP</item>
+        <item>GHS</item>
+        <item>KWD</item>
+        <item>CAD</item>
+        <item>QAR</item>
+        <item>BRL</item>
+        <item>ILS</item>
+        <item>KES</item>
+        <item>RUB</item>
+        <item>ZAR</item>
+        <item>CNY</item>
+        <item>JPY</item>
+    </string-array>
+
     <string name="app_name">Currency Converter</string>
     <string-array name="country_names">
         <item>Nigeria</item>
@@ -21,32 +44,57 @@
         <item>South Africa</item>
         <item>China</item>
         <item>Japan</item>
-
-
     </string-array>
 
-    <string-array name="country_short_codes">
-        <item>NGN</item>
-        <item>USD</item>
-        <item>GBP</item>
-        <item>KRW</item>
-        <item>INR</item>
-        <item>SAR</item>
-        <item>EUR</item>
-        <item>AED</item>
-        <item>EGP</item>
-        <item>GHS</item>
-        <item>KWD</item>
-        <item>CAD</item>
-        <item>QAR</item>
-        <item>BRL</item>
-        <item>ILS</item>
-        <item>KES</item>
-        <item>RUB</item>
-        <item>ZAR</item>
-        <item>CNY</item>
-        <item>JPY</item>
+    <integer-array name="countryflags">
+        <item>@drawable/nigeria</item>
+        <item>@drawable/united_states</item>
+        <item>@drawable/united_kingdom</item>
+        <item>@drawable/south_korea</item>
+        <item>@drawable/india</item>
+        <item>@drawable/saudi_arabia</item>
+        <item>@drawable/european_union</item>
+        <item>@drawable/united_arab_emirates</item>
+        <item>@drawable/egypt</item>
+        <item>@drawable/ghana</item>
+        <item>@drawable/kuwait</item>
+        <item>@drawable/canada</item>
+        <item>@drawable/qatar</item>
+        <item>@drawable/brazil</item>
+        <item>@drawable/israel</item>
+        <item>@drawable/kenya</item>
+        <item>@drawable/russia</item>
+        <item>@drawable/south_africa</item>
+        <item>@drawable/china</item>
+        <item>@drawable/japan</item>
+    </integer-array>
+
+    <integer-array name="currency_symbols">
+
+        <item>@drawable/nigeria_naira_currency_symbol</item>
+        <item>@drawable/dollar_currency_sign</item>
+        <item>@drawable/pound_symbol_variant</item>
+        <item>@drawable/south_korea_won</item>
+        <item>@drawable/india_rupee</item>
+        <item>@drawable/saudi_arabia_riyal</item>
+        <item>@drawable/europe_euro</item>
+        <item>@drawable/uae</item>
+        <item>@drawable/egypt_poung</item>
+        <item>@drawable/ghana_cedis</item>
+        <item>@drawable/kuwaitdinar</item>
+        <item>@drawable/canada_dollar</item>
+        <item>@drawable/qatar_riyal</item>
+        <item>@drawable/brazil_currency</item>
+        <item>@drawable/israel_shekel</item>
+        <item>@drawable/kenyashilling</item>
+        <item>@drawable/russia_ruble</item>
+        <item>@drawable/south_africa_rand</item>
+        <item>@drawable/yen_currency_symbol</item>
+        <item>@drawable/japanese_yen_currency</item>
+
+    </integer-array>
 
 
-    </string-array>
+
+
 </resources>
