@@ -21,6 +21,7 @@ import java.util.HashMap;
 
 public class Utils {
 
+    public static final String SHARED_PREFERENCE_FILE_KEY = "com.r4sh33d.currencyconverter.PREFERENCE_FILE_KEY";
     private static final String TAG = "debugtag";
     static String CURRENCY_INTENT_KEY = "currency_intent_key";
 
@@ -62,8 +63,10 @@ public class Utils {
 
         String[] projection = {
                 CurrencyContract._ID,
+                CurrencyContract.COLUMN_COUNTRY_SHORT_CODE,
                 CurrencyContract.COLUMN_DIALOG_LABEL,
                 CurrencyContract.COLUMN_IS_ENABLED
+
         };
 
 

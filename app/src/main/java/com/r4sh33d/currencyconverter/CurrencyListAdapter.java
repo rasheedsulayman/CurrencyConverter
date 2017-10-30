@@ -58,12 +58,9 @@ public class CurrencyListAdapter extends RecyclerView.Adapter<CurrencyListAdapte
         public MyHolder(View itemView) {
             super(itemView);
             headerText = (TextView) itemView.findViewById(R.id.headerText);
-
             oneBtcEquivalentTV = (TextView) itemView.findViewById(R.id.btcEquivalent);
             oneEthEquivalentBc = (TextView) itemView.findViewById(R.id.ethEquivalentTv);
-
             countryflagIv = (ImageView) itemView.findViewById(R.id.imageViewFlag);
-
             currencySymbolRow1Iv = (ImageView) itemView.findViewById(R.id.currencySymbol1);
             currencySymbolRow2Iv = (ImageView) itemView.findViewById(R.id.currencySymbol2);
             itemView.setOnClickListener(this);

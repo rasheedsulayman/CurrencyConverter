@@ -6,75 +6,45 @@ import android.text.Editable;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import java.text.DecimalFormat;
 
 public class ConversionActivity extends AppCompatActivity {
     EditText editTextBtc, editTextBaseCurrency, editTextEth;
-    TextView countryName, baseCurrencyShortCode;
+    TextView  baseCurrencyShortCode , headerText, oneBtcEquivalentTV, oneEthEquivalentBc;
     Currency currency;
     DecimalFormat formatter;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_conversion);
-        editTextBtc = (EditText) findViewById(R.id.editTextBtc);
-        editTextEth = (EditText) findViewById(R.id.editTextETH);
-        editTextBaseCurrency = (EditText) findViewById(R.id.editTextBaseCurrency);
-        countryName = (TextView) findViewById(R.id.countryName);
-        formatter = new DecimalFormat("#");
-        formatter.setMaximumFractionDigits(4);
-        baseCurrencyShortCode = (TextView) findViewById(R.id.baseCurrencyShortCode);
-        currency = getIntent().getParcelableExtra(Utils.CURRENCY_INTENT_KEY);
-        countryName.setText(currency.countryName);
-        baseCurrencyShortCode.setText(currency.countryShortCode);
-        setEditTextChangedListeners();
-    }
-
+    ImageView countryflagIv, currencySymbolRow1Iv, currencySymbolRow2Iv , baseCurrencySymbol;
     TextWatcher editTextBaseCurrencyWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
         @Override
         public void afterTextChanged(Editable s) {
-
 
             Utils.logMessage("After test changed called in base currency watcher");
             editTextBtc.removeTextChangedListener(editTextBtcTextWatcher);
             editTextEth.removeTextChangedListener(editTextEthWatecher);
             String enteredValue = s.toString();
             if (!TextUtils.isEmpty(enteredValue)) {
-
-
-
                 editTextBtc.setText(formatter.format(baseCurrencyToBtc(Double.parseDouble(enteredValue))));
                 editTextEth.setText(formatter.format(baseCurrencyToEth(Double.parseDouble(enteredValue))));
-
             }
-
-
             editTextBtc.addTextChangedListener(editTextBtcTextWatcher);
             editTextEth.addTextChangedListener(editTextEthWatecher);
-
         }
     };
     TextWatcher editTextBtcTextWatcher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-        }
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
         @Override
         public void afterTextChanged(Editable s) {
@@ -95,14 +65,10 @@ public class ConversionActivity extends AppCompatActivity {
     };
     TextWatcher editTextEthWatecher = new TextWatcher() {
         @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {
-
-        }
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
 
         @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {
-
-        }
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
 
         @Override
         public void afterTextChanged(Editable s) {
@@ -116,12 +82,51 @@ public class ConversionActivity extends AppCompatActivity {
             }
             editTextBaseCurrency.addTextChangedListener(editTextBaseCurrencyWatcher);
             editTextBtc.addTextChangedListener(editTextBtcTextWatcher);
-
         }
     };
 
-    void setEditTextChangedListeners() {
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_conversion);
+        bindViews();
+        formatter = new DecimalFormat("#");
+        formatter.setMinimumIntegerDigits(1);
+        formatter.setMaximumFractionDigits(4);
+        currency = getIntent().getParcelableExtra(Utils.CURRENCY_INTENT_KEY);
+        setViewValues();
+        setEditTextChangedListeners();
 
+    }
+
+    public void bindViews(){
+        baseCurrencyShortCode = (TextView) findViewById(R.id.baseCurrencyShortCode);
+        editTextBtc = (EditText) findViewById(R.id.editTextBtc);
+        editTextEth = (EditText) findViewById(R.id.editTextETH);
+        editTextBaseCurrency = (EditText) findViewById(R.id.editTextBaseCurrency);
+        headerText = (TextView)findViewById(R.id.headerText);
+        oneBtcEquivalentTV = (TextView) findViewById(R.id.btcEquivalent);
+        oneEthEquivalentBc = (TextView) findViewById(R.id.ethEquivalentTv);
+        countryflagIv = (ImageView) findViewById(R.id.imageViewFlag);
+        currencySymbolRow1Iv = (ImageView)findViewById(R.id.currencySymbol1);
+        currencySymbolRow2Iv = (ImageView) findViewById(R.id.currencySymbol2);
+        baseCurrencySymbol = (ImageView) findViewById(R.id.baseCurrencySymbol);
+    }
+
+    void setViewValues(){
+        baseCurrencyShortCode.setText(currency.countryShortCode);
+        baseCurrencySymbol.setImageResource(currency.currencySymbolResource);
+        headerText.setText( currency.countryName + " [" + currency.countryShortCode + "] ");
+        oneBtcEquivalentTV.setText(String.valueOf(currency.oneBtcEquivalent));
+        oneEthEquivalentBc.setText(String.valueOf(currency.oneEthEquivalent));
+        countryflagIv.setImageResource(currency.countryFlagResource);
+        currencySymbolRow1Iv.setImageResource(currency.currencySymbolResource);
+        currencySymbolRow2Iv.setImageResource(currency.currencySymbolResource);
+        editTextBaseCurrency.setHint("Enter " + currency.countryShortCode + " value");
+
+    }
+
+    void setEditTextChangedListeners() {
         editTextBaseCurrency.addTextChangedListener(editTextBaseCurrencyWatcher);
         editTextBtc.addTextChangedListener(editTextBtcTextWatcher);
         editTextEth.addTextChangedListener(editTextEthWatecher);
@@ -145,11 +150,11 @@ public class ConversionActivity extends AppCompatActivity {
     }
 
     double ethToBtc(double ethValue) {
-        return ethValue * currency.oneBtcEquivalent / currency.oneEthEquivalent;
+        return ethValue * currency.oneEthEquivalent / currency.oneBtcEquivalent;
     }
 
     double btcToEth(double btcValue) {
-        return btcValue * currency.oneEthEquivalent / currency.oneBtcEquivalent;
+        return btcValue * currency.oneBtcEquivalent / currency.oneEthEquivalent;
     }
 
 

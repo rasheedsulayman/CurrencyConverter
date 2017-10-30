@@ -3,6 +3,7 @@ package com.r4sh33d.currencyconverter;
 import android.content.Context;
 import android.database.Cursor;
 import android.support.v7.widget.RecyclerView;
+import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -17,15 +18,27 @@ import com.r4sh33d.currencyconverter.database.CurrencyContract;
  */
 
 public class MyCursorAdapter extends RecyclerView.Adapter<MyCursorAdapter.MyHolder> {
-    private Context context;
     Cursor cursor;
     MultichoiceItemSelectedListener selectedListener;
+    SparseBooleanArray sparseBooleanArray = new SparseBooleanArray();
+    private Context context;
+
 
     public MyCursorAdapter(Context context, Cursor cursor, MyCursorAdapter.MultichoiceItemSelectedListener selectedListener) {
         this.context = context;
         this.selectedListener = selectedListener;
         this.cursor = cursor;
+        prePopulateArrayFromCursor();
     }
+
+    private void  prePopulateArrayFromCursor() {
+        int columnIsEnabledIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_IS_ENABLED);
+         for (int i =0 ; i < cursor.getCount() ; i++ ){
+             cursor.moveToPosition(i);
+             sparseBooleanArray.put(i  , (cursor.getInt(columnIsEnabledIndex)==1));
+         }
+    }
+
 
     @Override
     public MyHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -36,20 +49,23 @@ public class MyCursorAdapter extends RecyclerView.Adapter<MyCursorAdapter.MyHold
     @Override
     public void onBindViewHolder(final MyHolder holder, int position) {
         Utils.logMessage("Inside onbindViewHolder :" + position);
-        cursor.move(position);
+        cursor.moveToPosition(position);
         int columnDialogLabelIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_DIALOG_LABEL);
-        int columnIsEnabledIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_IS_ENABLED);
+
         holder.labelText.setText(cursor.getString(columnDialogLabelIndex));
-        holder.checkBox.setChecked(cursor.getInt(columnIsEnabledIndex) == 1);
-        holder.checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
-            @Override
-            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                holder.checkBox.setChecked(isChecked);
-                selectedListener.onItemSelected(holder.getAdapterPosition(), isChecked);
-            }
-        });
+        if (sparseBooleanArray.get(position , false)){
+            holder.checkBox.setChecked(true);
+        }else {
+            holder.checkBox.setChecked(false);
+        }
 
 
+    }
+
+
+    @Override
+    public int getItemViewType(int position) {
+        return cursor.getCount();
     }
 
     @Override
@@ -57,7 +73,11 @@ public class MyCursorAdapter extends RecyclerView.Adapter<MyCursorAdapter.MyHold
         return cursor.getCount();
     }
 
-    class MyHolder extends RecyclerView.ViewHolder {
+    interface MultichoiceItemSelectedListener {
+        void onItemSelected(int which, boolean isChecked, String currencyShotCode);
+    }
+
+    class MyHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         CheckBox checkBox;
         TextView labelText;
 
@@ -65,12 +85,26 @@ public class MyCursorAdapter extends RecyclerView.Adapter<MyCursorAdapter.MyHold
             super(itemView);
             checkBox = (CheckBox) itemView.findViewById(R.id.checkboxDialog);
             labelText = (TextView) itemView.findViewById(R.id.labelText);
+            itemView.setOnClickListener(this);
+
+            checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+                @Override
+                public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                    Utils.logMessage("oncheckchanged lestener called ");
+                    int adapterPosition = getAdapterPosition();
+                    cursor.moveToPosition(adapterPosition);
+                    final int colunmSHortCodeIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_COUNTRY_SHORT_CODE);
+                    selectedListener.onItemSelected(getAdapterPosition(), isChecked, cursor.getString(colunmSHortCodeIndex));
+                    sparseBooleanArray.put(getAdapterPosition() , isChecked);
+
+                }
+            });
 
         }
-    }
 
-
-    interface MultichoiceItemSelectedListener {
-        void onItemSelected(int which, boolean isChecked);
+        @Override
+        public void onClick(View v) {
+            checkBox.setChecked(!checkBox.isChecked());
+        }
     }
 }

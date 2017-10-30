@@ -27,12 +27,12 @@
             android:layout_height="wrap_content">
 
             <ImageView
-                android:padding="10dp"
                 android:id="@+id/imageViewFlag"
-                android:layout_width="80dp"
-                android:layout_height="80dp"
+                android:layout_width="75dp"
+                android:layout_height="75dp"
                 android:layout_centerVertical="true"
-                android:layout_margin="8dp"
+                android:layout_margin="2dp"
+                android:padding="8dp"
                 android:src="@drawable/nigeria"
 
                 />
@@ -51,12 +51,12 @@
                     android:orientation="horizontal">
 
                     <ImageView
-                        android:paddingTop="3dp"
                         android:layout_width="20dp"
-                       android:scaleType="fitCenter"
                         android:layout_height="20dp"
-                        android:layout_gravity="center_vertical"
+                       android:layout_gravity="center_vertical"
                         android:layout_marginRight="6dp"
+                        android:paddingTop="3dp"
+                        android:scaleType="fitCenter"
                         android:src="@drawable/bitcoin_logo" />
 
                     <TextView
@@ -92,6 +92,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:maxLines="1"
                         android:text="2000"
                         android:textColor="@android:color/black"
                         android:textSize="20sp" />
@@ -106,11 +107,11 @@
 
                     <ImageView
                         android:layout_width="20dp"
-                          android:paddingTop="3dp"
-                        android:scaleType="fitCenter"
-                        android:layout_height="20dp"
+                          android:layout_height="20dp"
                         android:layout_gravity="center_vertical"
                         android:layout_marginRight="6dp"
+                        android:paddingTop="3dp"
+                        android:scaleType="fitCenter"
                         android:src="@drawable/eth_symbol" />
 
                     <TextView
@@ -145,6 +146,7 @@
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:layout_gravity="center_vertical"
+                        android:maxLines="1"
                         android:text="2000"
                         android:textColor="@android:color/black"
                         android:textSize="20sp" />

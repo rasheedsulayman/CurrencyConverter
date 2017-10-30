@@ -2,20 +2,18 @@ package com.r4sh33d.currencyconverter;
 
 import android.app.ProgressDialog;
 import android.content.ContentValues;
-import android.content.DialogInterface;
+import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.TypedArray;
 import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.design.widget.CoordinatorLayout;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.Toast;
 
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
@@ -35,7 +33,6 @@ import retrofit2.Response;
 public class HomeActivity extends AppCompatActivity {
     RecyclerView recyclerView;
     FloatingActionButton fab;
-    private CurrencyListAdapter currencyListAdapter;
     CurrencyDBHelper currencyDBHelper;
     SQLiteDatabase database;
     ArrayList<Currency> currencyArrayList = new ArrayList<>();
@@ -43,8 +40,8 @@ public class HomeActivity extends AppCompatActivity {
     HashMap<String, Integer> shortCodeFlagMap = new HashMap<>();
     HashMap<String, Integer> shortCodeCurrencySymbolMap = new HashMap<>();
     HashMap<String, String> codeCountryMap = new HashMap<>();
-    AlertDialog alertDialog;
-
+    SharedPreferences sharedPreferences;
+    private CurrencyListAdapter currencyListAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,95 +53,35 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         currencyListAdapter = new CurrencyListAdapter(this, currencyArrayList);
         recyclerView.setAdapter(currencyListAdapter);
+
         currencyDBHelper = new CurrencyDBHelper(this);
         database = currencyDBHelper.getWritableDatabase();
         buildCurrencyDetailsMapsFromShortCodes();
 
+        sharedPreferences = getSharedPreferences(
+                Utils.SHARED_PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
+
+
         if (!Utils.isDeviceConnected(this)) {
-            //load the last requested conversions from database
+            //We are offline , load the last requested conversions from database
             refreshRecyclerViewItems();
         } else {
-            //we have internet connection , load an up-to-date conversions from the  server
+            //we have internet connection , load an up-to-date conversions from the server
             getConversionRatesFromServer();
         }
 
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                setUpCreateCardDialog();
+                EnableCurrencyDialogFragment dialogFragment = new EnableCurrencyDialogFragment();
+                dialogFragment.show(getFragmentManager().beginTransaction(), null);
             }
         });
-    }
-
-
-    void setUpCreateCardDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(this);
-        final ArrayList<Integer> selectedItems = new ArrayList<>();  // Where we track the selected items
-        final ArrayList<Integer> desabledItems = new ArrayList<>(); // Where we keep track of disabled items
-
-
-        alertDialog = builder.setMultiChoiceItems(Utils.makeCreateCardDialogCursor(database), CurrencyContract.COLUMN_IS_ENABLED,
-                CurrencyContract.COLUMN_DIALOG_LABEL, new DialogInterface.OnMultiChoiceClickListener() {
-                    @Override
-                    public void onClick(DialogInterface dialog, int which, boolean isChecked) {
-
-                        Toast.makeText(HomeActivity.this, "Item clicked which is " + which
-                                + " isChecked " + isChecked, Toast.LENGTH_SHORT).show();
-
-                        int indexToUse = which + 1; // database rows start from 1 , while the "which" parameter  from callback start from zero , so adjust the offset.
-                        if (isChecked) {
-                            if (desabledItems.contains(indexToUse)) {
-                                desabledItems.remove(Integer.valueOf(indexToUse));
-                            }
-                            selectedItems.add(indexToUse);
-                        } else {
-                            if (selectedItems.contains(indexToUse)) {
-                                selectedItems.remove(Integer.valueOf(indexToUse));
-                            }
-                            desabledItems.add(indexToUse);
-                        }
-
-
-                    }
-                }).setPositiveButton("Create", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                Utils.logMessage("seleced items " + selectedItems);
-                Utils.logMessage("Disabled items " + desabledItems);
-                if (selectedItems.size() > 0) {
-                    Utils.updateCheckedRows(selectedItems, database);
-                }
-                if (desabledItems.size() > 0) {
-                    Utils.updateUncheckedRows(desabledItems, database);
-
-                }
-                refreshRecyclerViewItems();
-            }
-        }).setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-
-            }
-        }).setTitle("Create Conversion Cards").create();
-
-        alertDialog.getListView().setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
-            @Override
-            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
-
-            }
-
-            @Override
-            public void onNothingSelected(AdapterView<?> parent) {
-
-            }
-        });
-
-        alertDialog.show();
     }
 
 
     void getConversionRatesFromServer() {
-        Utils.logMessage("getConversionRatesFromServer called");
+
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
         dialog.setMessage("Loading up to date conversion ratio from the server ,  Please wait...");
@@ -158,12 +95,9 @@ public class HomeActivity extends AppCompatActivity {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
                 Utils.logMessage("onResponse called with " + response.body());
-                Toast.makeText(HomeActivity.this, "onResponse called with ", Toast.LENGTH_SHORT).show();
-                database = currencyDBHelper.getWritableDatabase();
                 database.delete(CurrencyContract.TABLE_NAME, null, null);
                 JsonObject jsonObject = new JsonParser().parse(response.body()).getAsJsonObject();
                 Set<String> shortCodeskeySet = jsonObject.getAsJsonObject("BTC").keySet();
-
 
                 for (String shortCode : shortCodeskeySet) {
                     ContentValues values = new ContentValues();
@@ -172,9 +106,16 @@ public class HomeActivity extends AppCompatActivity {
                     values.put(CurrencyContract.COLUMN_BTC_EQUIVALENT, jsonObject.getAsJsonObject("BTC").get(shortCode).getAsDouble());
                     values.put(CurrencyContract.COLUMN_ETH_EQUIVALENT, jsonObject.getAsJsonObject("ETH").get(shortCode).getAsDouble());
                     values.put(CurrencyContract.COLUMN_DIALOG_LABEL, codeCountryMap.get(shortCode) + " (" + shortCode + ")");
-                    values.put(CurrencyContract.COLUMN_IS_ENABLED, 0);
-                    long id = database.insert(CurrencyContract.TABLE_NAME, null, values);
-                    Utils.logMessage("row inserted with id " + id);
+
+                    Utils.logMessage("getting shared prefs ---> " + shortCode + " : " + sharedPreferences.getBoolean(shortCode, false));
+                    if (shortCode.equals("NGN") || shortCode.equals("USD")
+                            || shortCode.equals("EUR")) {
+                        values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
+                    } else {
+                        values.put(CurrencyContract.COLUMN_IS_ENABLED, sharedPreferences.getBoolean(shortCode, false) ? 1 : 0);
+                    }
+
+                    database.insert(CurrencyContract.TABLE_NAME, null, values);
                 }
                 dialog.dismiss();
                 refreshRecyclerViewItems();
@@ -183,6 +124,7 @@ public class HomeActivity extends AppCompatActivity {
 
             @Override
             public void onFailure(Call<String> call, Throwable t) {
+                dialog.dismiss();
                 t.printStackTrace();
                 Snackbar.make(coordinatorLayout, "Network connection error...", Snackbar.LENGTH_INDEFINITE)
                         .setAction("Retry", new View.OnClickListener() {
@@ -197,12 +139,25 @@ public class HomeActivity extends AppCompatActivity {
 
 
     public void refreshRecyclerViewItems() {
-        Utils.logMessage("inside refreshRecyclerviewItems");
+
         currencyArrayList.clear();
         currencyArrayList.addAll(Utils.getCurrencyList(Utils.makeConversionRatesCursor(database),
                 shortCodeFlagMap, shortCodeCurrencySymbolMap));
-        Utils.logMessage(currencyArrayList.toString());
-        currencyListAdapter.notifyDataSetChanged();
+
+        if (currencyArrayList.size() > 0) {
+            currencyListAdapter.notifyDataSetChanged();
+
+        } else {
+            //we are offline the first time of opening the app
+            Snackbar.make(coordinatorLayout, "Please turn on your internet connection and retry...", Snackbar.LENGTH_INDEFINITE)
+                    .setAction("Retry", new View.OnClickListener() {
+                        @Override
+                        public void onClick(View v) {
+                            getConversionRatesFromServer();
+                        }
+                    });
+        }
+
 
     }
 
@@ -215,7 +170,7 @@ public class HomeActivity extends AppCompatActivity {
         TypedArray arrayOfSymbols = getResources().obtainTypedArray(R.array.currency_symbols);
 
         for (int i = 0; i < arrayOfCurrencyShortCodes.length; i++) {
-            Utils.logMessage(arrayOfFlags.getResourceId(i, -1) + "");
+
             codeCountryMap.put(arrayOfCurrencyShortCodes[i], arrayOfCOuntryNames[i]);
             shortCodeFlagMap.put(arrayOfCurrencyShortCodes[i], arrayOfFlags.getResourceId(i, -1));
             shortCodeCurrencySymbolMap.put(arrayOfCurrencyShortCodes[i], arrayOfSymbols.getResourceId(i, -1));
@@ -236,10 +191,10 @@ public class HomeActivity extends AppCompatActivity {
         return result.substring(0, result.length() - 1);
     }
 
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
         database.close();
+
     }
 }

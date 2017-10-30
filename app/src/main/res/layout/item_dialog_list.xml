@@ -1,21 +1,28 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
+    android:layout_height="wrap_content"
+    android:background="?android:attr/selectableItemBackground"
     android:orientation="horizontal"
-    android:layout_marginTop="5dp"
-    android:layout_marginBottom="5dp">
+    android:paddingBottom="6dp"
+    android:paddingTop="6dp"
+
+    >
 
     <android.support.v7.widget.AppCompatCheckBox
         android:id="@+id/checkboxDialog"
         android:layout_width="wrap_content"
-        android:layout_marginLeft="16dp"
         android:layout_height="wrap_content"
+        android:layout_gravity="center_vertical"
+        android:layout_marginLeft="16dp"
         android:layout_marginRight="15dp"/>
 
     <TextView
         android:id="@+id/labelText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="item view "/>
+        android:layout_gravity="center_vertical"
+        android:text="item view "
+        android:textColor="@android:color/black"
+        android:textSize="18dp"/>
 </LinearLayout>
