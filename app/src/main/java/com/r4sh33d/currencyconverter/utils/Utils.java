@@ -1,15 +1,15 @@
-package com.r4sh33d.currencyconverter;
+package com.r4sh33d.currencyconverter.utils;
 
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
-import android.database.DatabaseUtils;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
 import com.r4sh33d.currencyconverter.database.CurrencyContract;
+import com.r4sh33d.currencyconverter.model.Currency;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -23,22 +23,22 @@ public class Utils {
 
     public static final String SHARED_PREFERENCE_FILE_KEY = "com.r4sh33d.currencyconverter.PREFERENCE_FILE_KEY";
     private static final String TAG = "debugtag";
-    static String CURRENCY_INTENT_KEY = "currency_intent_key";
+    public static String CURRENCY_INTENT_KEY = "currency_intent_key";
 
-    static void logMessage(String message) {
+    public static void logMessage(String message) {
         Log.d(TAG, message);
     }
 
-    static ArrayList<Currency> getCurrencyList(Cursor cursor,
-                                               HashMap<String, Integer> shortCodeFlagMap,
-                                               HashMap<String, Integer> shortCodeCurrencySymbolMap) {
+    public static ArrayList<Currency> getCurrencyList(Cursor cursor,
+                                                      HashMap<String, Integer> shortCodeFlagMap,
+                                                      HashMap<String, Integer> shortCodeCurrencySymbolMap) {
         ArrayList<Currency> arrayList = new ArrayList<>();
         int countryNameIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_COUNTRY_NAME);
         int countryShortcode = cursor.getColumnIndex(CurrencyContract.COLUMN_COUNTRY_SHORT_CODE);
         int btcEquivIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_BTC_EQUIVALENT);
         int ethEquivIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_ETH_EQUIVALENT);
         int isEnabledIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_IS_ENABLED);
-        logMessage("cursor == null " + (cursor == null));
+
         if ((cursor != null) && (cursor.moveToFirst()))
             do {
                 String shortCode = cursor.getString(countryShortcode);
@@ -60,36 +60,28 @@ public class Utils {
     }
 
     public static Cursor makeCreateCardDialogCursor(SQLiteDatabase database) {
-
         String[] projection = {
                 CurrencyContract._ID,
                 CurrencyContract.COLUMN_COUNTRY_SHORT_CODE,
                 CurrencyContract.COLUMN_DIALOG_LABEL,
                 CurrencyContract.COLUMN_IS_ENABLED
-
         };
 
-
-        Cursor cursor = database.query(
+        return database.query(
                 CurrencyContract.TABLE_NAME,
                 projection,
                 null,
                 null,
                 null,
                 null,
-                null // don't filter by row groups
+                null
         );
-
-        DatabaseUtils.dumpCursor(cursor);
-        return cursor;
 
     }
 
 
     public static Cursor makeConversionRatesCursor(SQLiteDatabase database) {
 
-        // Define a projection that specifies which columns from the database
-        // you will actually use after this query.
 
         String[] projection = {
                 CurrencyContract.COLUMN_COUNTRY_NAME,
@@ -99,25 +91,22 @@ public class Utils {
                 CurrencyContract.COLUMN_IS_ENABLED,
         };
 
-        // Filter results WHERE "title" = 'My Title'
         String selection = CurrencyContract.COLUMN_IS_ENABLED
                 + " = ?";
         String[] selectionArgs = {"1"};
 
-        // How you want the results sorted in the resulting Cursor
 
 
         Cursor cursor = database.query(
-                CurrencyContract.TABLE_NAME,                     // The table to query
-                projection,                               // The columns to return
-                selection,                                // The columns for the WHERE clause
-                selectionArgs,                            // The values for the WHERE clause
-                null,                                     // don't group the rows
+                CurrencyContract.TABLE_NAME,
+                projection,
+                selection,
+                selectionArgs,
                 null,
-                null // don't filter by row groups
+                null,
+                null
         );
 
-        DatabaseUtils.dumpCursor(cursor);
         return cursor;
 
     }
@@ -130,10 +119,15 @@ public class Utils {
     }
 
 
-    static void updateCheckedRows(ArrayList<Integer> rowsToUpdate, SQLiteDatabase database) {
+    /**
+     * @param rowsToUpdate
+     * @param database
+     *
+     * activates  rows (Currencies ) selected from the dialog
+     */
+    public static void updateCheckedRows(ArrayList<Integer> rowsToUpdate, SQLiteDatabase database) {
         ContentValues values = new ContentValues();
         values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
-
         String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
         String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
         int count = database.update(
@@ -144,10 +138,15 @@ public class Utils {
         Utils.logMessage("Succesully updated " + count + " rows ");
     }
 
-    static void updateUncheckedRows(ArrayList<Integer> rowsToUpdate, SQLiteDatabase database) {
+    /**
+     * @param rowsToUpdate
+     * @param database
+     *
+     * de-activate unchecked rows(currency cards) from the dialog
+     */
+    public static void updateUncheckedRows(ArrayList<Integer> rowsToUpdate, SQLiteDatabase database) {
         ContentValues values = new ContentValues();
         values.put(CurrencyContract.COLUMN_IS_ENABLED, 0);
-
         String selection = CurrencyContract._ID + " IN (" + makePlaceholders(rowsToUpdate.size()) + ")";
         String[] selectionArgs = makeDbPlaceHolderFromIds(rowsToUpdate);
         int count = database.update(
@@ -160,6 +159,12 @@ public class Utils {
     }
 
 
+    /**
+     * @param arrayList
+     * @return
+     *
+     * builds the list of rows to change for the  sqlite 'IN' statement
+     */
     public static String[] makeDbPlaceHolderFromIds(ArrayList<Integer> arrayList) {
         String[] toReturn = new String[arrayList.size()];
         for (int i = 0; i < toReturn.length; i++) {

@@ -12,6 +12,7 @@ import retrofit2.http.Query;
 public interface CurrencyRetrofitService {
 
 
+
     @GET("data/pricemulti")
    public Call<String> getConVersionRates(@Query("fsyms") String fromSys , @Query("tsyms") String toSys);
 

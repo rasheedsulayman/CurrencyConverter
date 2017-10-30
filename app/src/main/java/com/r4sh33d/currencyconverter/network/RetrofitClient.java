@@ -11,25 +11,15 @@ import retrofit2.converter.scalars.ScalarsConverterFactory;
 
 public class RetrofitClient {
 
-
-
     public static final String baseUrl = "https://min-api.cryptocompare.com/";
     public  static  final String CRYPTOCURRENCIES_TO_CONVERT_FROM = "BTC,ETH";
-    public static final String COUNTRYCURRENCIES_TO_CONVERT_TO = "";
-
-
 
     private static Retrofit retrofit = null;
 
     public static Retrofit getClient() {
         HttpLoggingInterceptor logging = new HttpLoggingInterceptor();
-// set your desired log level
         logging.setLevel(HttpLoggingInterceptor.Level.BASIC);
-
         OkHttpClient.Builder httpClient = new OkHttpClient.Builder();
-// add your other interceptors …
-
-// add logging as last interceptor
         httpClient.addInterceptor(logging);
 
         if (retrofit == null) {
@@ -43,10 +33,4 @@ public class RetrofitClient {
         return retrofit;
     }
 
-
-    public static CurrencyRetrofitService getCurrencyRetrofitService() {
-        return RetrofitClient.getClient().create(CurrencyRetrofitService.class);
-
-
-    }
 }

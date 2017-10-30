@@ -1,4 +1,4 @@
-package com.r4sh33d.currencyconverter;
+package com.r4sh33d.currencyconverter.fragments;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -11,29 +11,29 @@ import android.database.sqlite.SQLiteDatabase;
 import android.os.Bundle;
 import android.support.v7.widget.LinearLayoutManager;
 import android.support.v7.widget.RecyclerView;
-import android.util.SparseBooleanArray;
 import android.view.LayoutInflater;
 import android.view.View;
 
+import com.r4sh33d.currencyconverter.R;
+import com.r4sh33d.currencyconverter.utils.Utils;
+import com.r4sh33d.currencyconverter.activities.HomeActivity;
+import com.r4sh33d.currencyconverter.adapters.DialogCursorAdapter;
 import com.r4sh33d.currencyconverter.database.CurrencyDBHelper;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 
 /**
  * Created by rasheed on 10/27/17.
  */
 
-public class EnableCurrencyDialogFragment extends DialogFragment implements MyCursorAdapter.MultichoiceItemSelectedListener {
+public class EnableCurrencyDialogFragment extends DialogFragment implements DialogCursorAdapter.MultichoiceItemSelectedListener {
     final ArrayList<Integer> selectedItems = new ArrayList<>();  // Where we track the selected items
     final ArrayList<Integer> desabledItems = new ArrayList<>(); //Where we track disabled items
     RecyclerView recyclerView;
-    MyCursorAdapter myCursorAdapter;
+    DialogCursorAdapter myCursorAdapter;
     SQLiteDatabase database;
     Cursor cursor;
-    HashMap<String, Boolean> map;
     SharedPreferences.Editor editor;
-    private CurrencyDBHelper currencyDBHelper;
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -47,14 +47,14 @@ public class EnableCurrencyDialogFragment extends DialogFragment implements MyCu
         desabledItems.clear();
         selectedItems.clear();
 
-        currencyDBHelper = new CurrencyDBHelper(getActivity());
+        CurrencyDBHelper currencyDBHelper = new CurrencyDBHelper(getActivity());
         database = currencyDBHelper.getWritableDatabase();
         SharedPreferences sharedPref;
         sharedPref = getActivity().getSharedPreferences(
                 Utils.SHARED_PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
         editor = sharedPref.edit();
         cursor = Utils.makeCreateCardDialogCursor(database);
-        myCursorAdapter = new MyCursorAdapter(getActivity(), cursor,
+        myCursorAdapter = new DialogCursorAdapter(getActivity(), cursor,
                 this);
 
         AlertDialog.Builder mBuilder = new AlertDialog.Builder(getActivity());
@@ -73,7 +73,6 @@ public class EnableCurrencyDialogFragment extends DialogFragment implements MyCu
                 if (desabledItems.size() > 0) {
                     Utils.updateUncheckedRows(desabledItems, database);
                 }
-
                 ((HomeActivity) getActivity()).refreshRecyclerViewItems();
                 editor.apply();
             }
@@ -91,28 +90,29 @@ public class EnableCurrencyDialogFragment extends DialogFragment implements MyCu
     }
 
 
+    /**
+     * @param which
+     * @param isChecked
+     * @param currencyShortCode
+     *
+     * Called when an item is checked/unchecked from the Create card dialog
+     */
     @Override
     public void onItemSelected(int which, boolean isChecked, String currencyShortCode) {
-        HashMap<String, Boolean> isEnabledMap = new HashMap<>();
-        SparseBooleanArray sparseBooleanArray = new SparseBooleanArray();
         which++; //adapter position start from zero , while cursor column _ID start from 1 .
-        sparseBooleanArray.put(which, isChecked);
         if (isChecked) {
             if (desabledItems.contains(which)) {
                 desabledItems.remove(Integer.valueOf(which));
             }
             selectedItems.add(which);
-
         } else {
             if (selectedItems.contains(which)) {
                 selectedItems.remove(Integer.valueOf(which));
             }
             desabledItems.add(which);
         }
-
         editor.putBoolean(currencyShortCode, isChecked);
         Utils.logMessage("Put boolean --->" + currencyShortCode + " : " + isChecked );
-
     }
 
     @Override

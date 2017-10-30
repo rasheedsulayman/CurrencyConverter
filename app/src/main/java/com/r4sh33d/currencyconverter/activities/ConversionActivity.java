@@ -1,4 +1,4 @@
-package com.r4sh33d.currencyconverter;
+package com.r4sh33d.currencyconverter.activities;
 
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
@@ -9,6 +9,10 @@ import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.TextView;
 
+import com.r4sh33d.currencyconverter.model.Currency;
+import com.r4sh33d.currencyconverter.R;
+import com.r4sh33d.currencyconverter.utils.Utils;
+
 import java.text.DecimalFormat;
 
 public class ConversionActivity extends AppCompatActivity {
@@ -17,6 +21,50 @@ public class ConversionActivity extends AppCompatActivity {
     Currency currency;
     DecimalFormat formatter;
     ImageView countryflagIv, currencySymbolRow1Iv, currencySymbolRow2Iv , baseCurrencySymbol;
+    TextWatcher editTextEthWatecher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            Utils.logMessage("After test changed called in eth watcher");
+            editTextBaseCurrency.removeTextChangedListener(editTextBaseCurrencyWatcher);
+            editTextBtc.removeTextChangedListener(editTextBtcTextWatcher);
+            String enteredValue = s.toString();
+            if (!TextUtils.isEmpty(enteredValue)) {
+                editTextBaseCurrency.setText(formatter.format(ethToBaseCurrency(Double.parseDouble(enteredValue))));
+                editTextBtc.setText(formatter.format(ethToBtc(Double.parseDouble(enteredValue))));
+            }
+            editTextBaseCurrency.addTextChangedListener(editTextBaseCurrencyWatcher);
+            editTextBtc.addTextChangedListener(editTextBtcTextWatcher);
+        }
+    };
+    TextWatcher editTextBtcTextWatcher = new TextWatcher() {
+        @Override
+        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
+
+        @Override
+        public void onTextChanged(CharSequence s, int start, int before, int count) {}
+
+        @Override
+        public void afterTextChanged(Editable s) {
+            Utils.logMessage("After test changed called in base btc watcher");
+            editTextEth.removeTextChangedListener(editTextEthWatecher);
+            editTextBaseCurrency.removeTextChangedListener(editTextBaseCurrencyWatcher);
+            String enteredValue = s.toString();
+            if (!TextUtils.isEmpty(enteredValue)) {
+                Utils.logMessage("Entered the if statement");
+                editTextEth.setText(formatter.format(btcToEth(Double.parseDouble(enteredValue))));
+                editTextBaseCurrency.setText(formatter.format(btcTobaseCurrency(Double.parseDouble(enteredValue))));
+            }
+            editTextEth.addTextChangedListener(editTextEthWatecher);
+            editTextBaseCurrency.addTextChangedListener(editTextBaseCurrencyWatcher);
+
+        }
+    };
     TextWatcher editTextBaseCurrencyWatcher = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
@@ -39,51 +87,6 @@ public class ConversionActivity extends AppCompatActivity {
             editTextEth.addTextChangedListener(editTextEthWatecher);
         }
     };
-    TextWatcher editTextBtcTextWatcher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            Utils.logMessage("After test changed called in base btc watcher");
-            editTextEth.removeTextChangedListener(editTextEthWatecher);
-            editTextBaseCurrency.removeTextChangedListener(editTextBaseCurrencyWatcher);
-            String enteredValue = s.toString();
-            if (!TextUtils.isEmpty(enteredValue)) {
-                Utils.logMessage("Entered the if statement");
-
-                editTextEth.setText(formatter.format(btcToEth(Double.parseDouble(enteredValue))));
-                editTextBaseCurrency.setText(formatter.format(btcTobaseCurrency(Double.parseDouble(enteredValue))));
-            }
-            editTextEth.addTextChangedListener(editTextEthWatecher);
-            editTextBaseCurrency.addTextChangedListener(editTextBaseCurrencyWatcher);
-
-        }
-    };
-    TextWatcher editTextEthWatecher = new TextWatcher() {
-        @Override
-        public void beforeTextChanged(CharSequence s, int start, int count, int after) {}
-
-        @Override
-        public void onTextChanged(CharSequence s, int start, int before, int count) {}
-
-        @Override
-        public void afterTextChanged(Editable s) {
-            Utils.logMessage("After test changed called in eth watcher");
-            editTextBaseCurrency.removeTextChangedListener(editTextBaseCurrencyWatcher);
-            editTextBtc.removeTextChangedListener(editTextBtcTextWatcher);
-            String enteredValue = s.toString();
-            if (!TextUtils.isEmpty(enteredValue)) {
-                editTextBaseCurrency.setText(formatter.format(ethToBaseCurrency(Double.parseDouble(enteredValue))));
-                editTextBtc.setText(formatter.format(ethToBtc(Double.parseDouble(enteredValue))));
-            }
-            editTextBaseCurrency.addTextChangedListener(editTextBaseCurrencyWatcher);
-            editTextBtc.addTextChangedListener(editTextBtcTextWatcher);
-        }
-    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -96,7 +99,6 @@ public class ConversionActivity extends AppCompatActivity {
         currency = getIntent().getParcelableExtra(Utils.CURRENCY_INTENT_KEY);
         setViewValues();
         setEditTextChangedListeners();
-
     }
 
     public void bindViews(){

@@ -3,7 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.r4sh33d.currencyconverter.ConversionActivity">
+    tools:context="com.r4sh33d.currencyconverter.activities.ConversionActivity">
 
     <include android:id="@+id/include"
         layout="@layout/item_currency_list"  />

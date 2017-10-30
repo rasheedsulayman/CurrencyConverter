@@ -1,4 +1,4 @@
-package com.r4sh33d.currencyconverter;
+package com.r4sh33d.currencyconverter.adapters;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,6 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import com.r4sh33d.currencyconverter.model.Currency;
+import com.r4sh33d.currencyconverter.R;
+import com.r4sh33d.currencyconverter.utils.Utils;
+import com.r4sh33d.currencyconverter.activities.ConversionActivity;
 
 import java.util.ArrayList;
 

@@ -1,4 +1,4 @@
-package com.r4sh33d.currencyconverter;
+package com.r4sh33d.currencyconverter.model;
 
 import android.os.Parcel;
 import android.os.Parcelable;
@@ -8,13 +8,25 @@ import android.os.Parcelable;
  */
 
 public class Currency implements Parcelable {
-    String countryName;
-    String countryShortCode;
-    double oneBtcEquivalent;
-    double oneEthEquivalent;
+    public static final Creator<Currency> CREATOR = new Creator<Currency>() {
+        @Override
+        public Currency createFromParcel(Parcel in) {
+            return new Currency(in);
+        }
+
+        @Override
+        public Currency[] newArray(int size) {
+            return new Currency[size];
+        }
+    };
+    public String countryName;
+    public String countryShortCode;
+    public double oneBtcEquivalent;
+    public double oneEthEquivalent;
+    public int countryFlagResource;
+    public int currencySymbolResource;
     int isActivated;
-    int countryFlagResource;
-    int currencySymbolResource;
+
 
     public Currency(String countryName, String countryShortCode, double oneBtcEquivalent, double oneEthEquivalent,
                     int isActivated, int countryFlagResource, int currencySymbolResource) {
@@ -26,7 +38,6 @@ public class Currency implements Parcelable {
         this.countryFlagResource = countryFlagResource;
         this.currencySymbolResource = currencySymbolResource;
     }
-
 
     protected Currency(Parcel in) {
         countryName = in.readString();
@@ -53,19 +64,6 @@ public class Currency implements Parcelable {
     public int describeContents() {
         return 0;
     }
-
-    public static final Creator<Currency> CREATOR = new Creator<Currency>() {
-        @Override
-        public Currency createFromParcel(Parcel in) {
-            return new Currency(in);
-        }
-
-        @Override
-        public Currency[] newArray(int size) {
-            return new Currency[size];
-        }
-    };
-
 
     @Override
     public String toString() {
