@@ -23,13 +23,14 @@ import java.util.HashMap;
 public class Utils {
 
     public static final String SHARED_PREFERENCE_FILE_KEY = "com.r4sh33d.currencyconverter.PREFERENCE_FILE_KEY";
+
     private static final String TAG = "debugtag";
+
     public static String CURRENCY_INTENT_KEY = "currency_intent_key";
 
     public static void logMessage(String message) {
         Log.d(TAG, message);
     }
-
     public static ArrayList<Currency> getCurrencyList(Cursor cursor,
                                                       HashMap<String, Integer> shortCodeFlagMap,
                                                       HashMap<String, Integer> shortCodeCurrencySymbolMap) {
@@ -79,11 +80,7 @@ public class Utils {
         );
 
     }
-
-
     public static Cursor makeConversionRatesCursor(SQLiteDatabase database) {
-
-
         String[] projection = {
                 CurrencyContract.COLUMN_COUNTRY_NAME,
                 CurrencyContract.COLUMN_COUNTRY_SHORT_CODE,
@@ -91,11 +88,9 @@ public class Utils {
                 CurrencyContract.COLUMN_ETH_EQUIVALENT,
                 CurrencyContract.COLUMN_IS_ENABLED,
         };
-
         String selection = CurrencyContract.COLUMN_IS_ENABLED
                 + " = ?";
         String[] selectionArgs = {"1"};
-
         Cursor cursor = database.query(
                 CurrencyContract.TABLE_NAME,
                 projection,
@@ -115,7 +110,6 @@ public class Utils {
         NetworkInfo netInfo = cm.getActiveNetworkInfo();
         return netInfo != null && netInfo.isConnectedOrConnecting();
     }
-
 
     /**
      * @param rowsToUpdate
@@ -151,10 +145,7 @@ public class Utils {
                 values,
                 selection,
                 selectionArgs);
-
     }
-
-
     /**
      * @param arrayList
      * @return
@@ -168,8 +159,6 @@ public class Utils {
         }
         return toReturn;
     }
-
-
     public static String makePlaceholders(int len) {
 
         if (len < 1) {
