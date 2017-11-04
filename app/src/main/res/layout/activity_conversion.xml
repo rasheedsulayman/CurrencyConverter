@@ -83,7 +83,7 @@
                     android:layout_marginStart="13dp"
                     android:background="@drawable/rounded_edittext"
                     android:ems="10"
-                    android:hint="Enter BTC value"
+                    android:hint="@string/enter_btc_value"
                     android:inputType="numberDecimal"
                     android:padding="10dp" />
                 <TextView
@@ -92,7 +92,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
-                    android:text="BTC"
+                    android:text="@string/btc"
                     android:textColor="@android:color/black"
 
                     android:textSize="24sp" />
@@ -126,7 +126,7 @@
                     android:layout_marginStart="13dp"
                     android:background="@drawable/rounded_edittext"
                     android:ems="10"
-                    android:hint="Enter ETH value"
+                    android:hint="@string/enter_eth_value"
                     android:inputType="numberDecimal"
                     android:padding="10dp" />
                 <TextView
@@ -135,7 +135,7 @@
                     android:layout_gravity="center_vertical"
                     android:layout_marginLeft="10dp"
                     android:layout_marginStart="10dp"
-                    android:text="ETH"
+                    android:text="@string/eth"
                     android:textColor="@android:color/black"
                     android:textSize="24sp" />
             </LinearLayout>
@@ -150,7 +150,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:text="Hint : Enter a value in one of the textboxes below. It will be automatically in other textboxes"
+        android:text="@string/conversion_activity_int"
         android:textColor="@android:color/black"
         />
 

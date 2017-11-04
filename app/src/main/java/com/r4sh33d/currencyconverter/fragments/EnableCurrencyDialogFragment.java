@@ -62,11 +62,11 @@ public class EnableCurrencyDialogFragment extends DialogFragment implements Dial
         recyclerView = (RecyclerView) v.findViewById(R.id.recyclerViewDialog);
         recyclerView.setAdapter(myCursorAdapter);
         recyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
-        mBuilder.setPositiveButton("Create", new DialogInterface.OnClickListener() {
+        mBuilder.setPositiveButton(R.string.create, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                Utils.logMessage("seleced items " + selectedItems);
-                Utils.logMessage("Disabled items " + desabledItems);
+
+
                 if (selectedItems.size() > 0) {
                     Utils.updateCheckedRows(selectedItems, database);
                 }
@@ -77,12 +77,12 @@ public class EnableCurrencyDialogFragment extends DialogFragment implements Dial
                 editor.apply();
             }
         });
-        mBuilder.setNegativeButton("Cancel", new DialogInterface.OnClickListener() {
+        mBuilder.setNegativeButton(R.string.cancel, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
                 dismiss();
             }
-        }).setTitle("Create Cards");
+        }).setTitle(R.string.create_cards);
 
         mBuilder.setView(v);
         return mBuilder.create();
@@ -112,7 +112,7 @@ public class EnableCurrencyDialogFragment extends DialogFragment implements Dial
             desabledItems.add(which);
         }
         editor.putBoolean(currencyShortCode, isChecked);
-        Utils.logMessage("Put boolean --->" + currencyShortCode + " : " + isChecked );
+
     }
 
     @Override

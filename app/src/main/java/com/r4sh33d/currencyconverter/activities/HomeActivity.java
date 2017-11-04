@@ -36,16 +36,16 @@ import retrofit2.Callback;
 import retrofit2.Response;
 
 public class HomeActivity extends AppCompatActivity {
-    RecyclerView recyclerView;
-    FloatingActionButton fab;
-    CurrencyDBHelper currencyDBHelper;
-    SQLiteDatabase database;
-    ArrayList<Currency> currencyArrayList = new ArrayList<>();
-    CoordinatorLayout coordinatorLayout;
-    HashMap<String, Integer> shortCodeFlagMap = new HashMap<>();
-    HashMap<String, Integer> shortCodeCurrencySymbolMap = new HashMap<>();
-    HashMap<String, String> codeCountryMap = new HashMap<>();
-    SharedPreferences sharedPreferences;
+    private RecyclerView recyclerView;
+    private FloatingActionButton fab;
+    private CurrencyDBHelper currencyDBHelper;
+    private SQLiteDatabase database;
+    private ArrayList<Currency> currencyArrayList = new ArrayList<>();
+    private CoordinatorLayout coordinatorLayout;
+    private HashMap<String, Integer> shortCodeFlagMap = new HashMap<>();
+    private HashMap<String, Integer> shortCodeCurrencySymbolMap = new HashMap<>();
+    private HashMap<String, String> codeCountryMap = new HashMap<>();
+    private SharedPreferences sharedPreferences;
     private CurrencyListAdapter currencyListAdapter;
 
     @Override
@@ -85,10 +85,10 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
-    void getConversionRatesFromServer() {
+    private void getConversionRatesFromServer() {
         final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
-        dialog.setMessage("Loading up to date conversion ratio from the server ,  Please wait...");
+        dialog.setMessage(getString(R.string.loading_conversion_ratio));
         dialog.setCancelable(false);
         dialog.setCanceledOnTouchOutside(false);
         dialog.show();
@@ -101,6 +101,7 @@ public class HomeActivity extends AppCompatActivity {
                 //we have new data , drop the previous cached one
                 database.delete(CurrencyContract.TABLE_NAME, null, null);
                 JsonObject jsonObject = new JsonParser().parse(response.body()).getAsJsonObject();
+
                 if (jsonObject != null && jsonObject.has("BTC") && jsonObject.has("ETH")) {
 
                     Set<String> shortCodeskeySet = jsonObject.getAsJsonObject("BTC").keySet();
@@ -114,26 +115,27 @@ public class HomeActivity extends AppCompatActivity {
 
                         if (shortCode.equals("NGN") || shortCode.equals("USD")
                                 || shortCode.equals("EUR")) {
-                            Utils.logMessage("getting shared prefs ---> " + shortCode + " : " + sharedPreferences.getBoolean(shortCode, false));
                             //The idea here is to have some pre-enabled currencies when opening the app for the first time .
                             // so that we don't have an empty screen first time  we open the app
                             values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
                         } else {
                             //get user's preference
                             values.put(CurrencyContract.COLUMN_IS_ENABLED, sharedPreferences.getBoolean(shortCode, false) ? 1 : 0);
-                        }                        database.insert(CurrencyContract.TABLE_NAME, null, values);
+                        }
+                        database.insert(CurrencyContract.TABLE_NAME, null, values);
                     }
                     dialog.dismiss();
                     refreshRecyclerViewItems();
                 } else {
-                    showSnackBar("Something went wrong ...");
+                    showSnackBar(getString(R.string.something_went_wrong));
                 }
             }
+
             @Override
             public void onFailure(Call<String> call, Throwable t) {
                 dialog.dismiss();
                 t.printStackTrace();
-                showSnackBar("Network connection error...");
+                showSnackBar(getString(R.string.network_error));
             }
         });
     }
@@ -144,7 +146,7 @@ public class HomeActivity extends AppCompatActivity {
             public void onClick(View v) {
                 getConversionRatesFromServer();
             }
-        });
+        }).show();
     }
 
     public void refreshRecyclerViewItems() {
@@ -158,8 +160,8 @@ public class HomeActivity extends AppCompatActivity {
             currencyListAdapter.notifyDataSetChanged();
 
         } else {
-            //we are offline the first time of opening the app
-            showSnackBar("Please turn on your internet connection and retry...");
+            //we are offline the first time of opening the app  or we have empty data from the server
+            showSnackBar(getString(R.string.enable_internet));
         }
     }
 
@@ -168,7 +170,6 @@ public class HomeActivity extends AppCompatActivity {
 
         String[] arrayOfCurrencyShortCodes = getResources().getStringArray(R.array.country_short_codes);
         String[] arrayOfCOuntryNames = getResources().getStringArray(R.array.country_names);
-
         TypedArray arrayOfFlags = getResources().obtainTypedArray(R.array.countryflags);
         TypedArray arrayOfSymbols = getResources().obtainTypedArray(R.array.currency_symbols);
 

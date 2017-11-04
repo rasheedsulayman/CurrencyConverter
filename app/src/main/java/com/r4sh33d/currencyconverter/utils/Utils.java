@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.r4sh33d.currencyconverter.database.CurrencyContract;
@@ -95,8 +96,6 @@ public class Utils {
                 + " = ?";
         String[] selectionArgs = {"1"};
 
-
-
         Cursor cursor = database.query(
                 CurrencyContract.TABLE_NAME,
                 projection,
@@ -108,7 +107,6 @@ public class Utils {
         );
 
         return cursor;
-
     }
 
     public static boolean isDeviceConnected(Context context) {
@@ -135,7 +133,6 @@ public class Utils {
                 values,
                 selection,
                 selectionArgs);
-        Utils.logMessage("Succesully updated " + count + " rows ");
     }
 
     /**
@@ -154,7 +151,6 @@ public class Utils {
                 values,
                 selection,
                 selectionArgs);
-        Utils.logMessage("Successfully updated " + count + " rows ");
 
     }
 
@@ -175,7 +171,7 @@ public class Utils {
 
 
     public static String makePlaceholders(int len) {
-        Utils.logMessage("The length in makePlaceHolder is " + len);
+
         if (len < 1) {
             // It will lead to an invalid query anyway ..
             throw new RuntimeException("No placeholders");
@@ -187,5 +183,9 @@ public class Utils {
             }
             return sb.toString();
         }
+    }
+
+    public static  boolean isAValidNumber(String number){
+        return !TextUtils.isEmpty(number) && !number.equalsIgnoreCase(".");
     }
 }

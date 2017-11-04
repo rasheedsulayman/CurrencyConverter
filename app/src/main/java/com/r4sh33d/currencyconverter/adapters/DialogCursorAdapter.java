@@ -12,7 +12,6 @@ import android.widget.CompoundButton;
 import android.widget.TextView;
 
 import com.r4sh33d.currencyconverter.R;
-import com.r4sh33d.currencyconverter.utils.Utils;
 import com.r4sh33d.currencyconverter.database.CurrencyContract;
 
 /**
@@ -50,7 +49,7 @@ public class DialogCursorAdapter extends RecyclerView.Adapter<DialogCursorAdapte
 
     @Override
     public void onBindViewHolder(final MyHolder holder, int position) {
-        Utils.logMessage("Inside onbindViewHolder :" + position);
+
         cursor.moveToPosition(position);
         int columnDialogLabelIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_DIALOG_LABEL);
         holder.labelText.setText(cursor.getString(columnDialogLabelIndex));
@@ -89,7 +88,7 @@ public class DialogCursorAdapter extends RecyclerView.Adapter<DialogCursorAdapte
             checkBox.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
                 @Override
                 public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
-                    Utils.logMessage("oncheckchanged lestener called ");
+
                     cursor.moveToPosition(getAdapterPosition());
                     final int colunmShortCodeIndex = cursor.getColumnIndex(CurrencyContract.COLUMN_COUNTRY_SHORT_CODE);
                     selectedListener.onItemSelected(getAdapterPosition(), isChecked, cursor.getString(colunmShortCodeIndex));

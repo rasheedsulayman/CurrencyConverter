@@ -1,28 +1,19 @@
 <resources>
-    <string-array name="country_short_codes">
-        <item>NGN</item>
-        <item>USD</item>
-        <item>GBP</item>
-        <item>KRW</item>
-        <item>INR</item>
-        <item>SAR</item>
-        <item>EUR</item>
-        <item>AED</item>
-        <item>EGP</item>
-        <item>GHS</item>
-        <item>KWD</item>
-        <item>CAD</item>
-        <item>QAR</item>
-        <item>BRL</item>
-        <item>ILS</item>
-        <item>KES</item>
-        <item>RUB</item>
-        <item>ZAR</item>
-        <item>CNY</item>
-        <item>JPY</item>
-    </string-array>
 
     <string name="app_name">Currency Converter</string>
+    <string name="conversion_activity_int">Hint : Enter a value in one of the textboxes below. It will be automatically converted in other textboxes</string>
+    <string name="something_went_wrong">Something went wrong ...</string>
+    <string name="network_error">Network connection error...</string>
+    <string name="loading_conversion_ratio">Loading up to date conversion ratio from the server ,  Please wait...</string>
+    <string name="enable_internet">Please turn on your internet connection and retry...</string>
+    <string name="create">Create</string>
+    <string name="cancel">Cancel</string>
+    <string name="create_cards">Create Cards</string>
+    <string name="enter_btc_value">Enter BTC value</string>
+    <string name="btc">BTC</string>
+    <string name="enter_eth_value">Enter ETH value</string>
+    <string name="eth">ETH</string>
+    <string name="header">Header</string>
     <string-array name="country_names">
         <item>Nigeria</item>
         <item>United States</item>
@@ -44,6 +35,29 @@
         <item>South Africa</item>
         <item>China</item>
         <item>Japan</item>
+    </string-array>
+
+    <string-array name="country_short_codes">
+        <item>NGN</item>
+        <item>USD</item>
+        <item>GBP</item>
+        <item>KRW</item>
+        <item>INR</item>
+        <item>SAR</item>
+        <item>EUR</item>
+        <item>AED</item>
+        <item>EGP</item>
+        <item>GHS</item>
+        <item>KWD</item>
+        <item>CAD</item>
+        <item>QAR</item>
+        <item>BRL</item>
+        <item>ILS</item>
+        <item>KES</item>
+        <item>RUB</item>
+        <item>ZAR</item>
+        <item>CNY</item>
+        <item>JPY</item>
     </string-array>
 
     <integer-array name="countryflags">
@@ -68,6 +82,7 @@
         <item>@drawable/china</item>
         <item>@drawable/japan</item>
     </integer-array>
+
 
     <integer-array name="currency_symbols">
 
