@@ -1,30 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.r4sh33d.currencyconverter.activities.ConversionActivity">
-
-    <include android:id="@+id/include"
-        layout="@layout/item_currency_list"  />
+    android:orientation="horizontal">
 
     <android.support.v7.widget.CardView
         android:id="@+id/cardview"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
         android:layout_below="@+id/include"
         android:layout_margin="4dp">
 
         <RelativeLayout
-            android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_width="wrap_content"
+            android:layout_height="match_parent"
+            android:paddingRight="10dp">
+
             <LinearLayout
                 android:id="@+id/linearlayout1"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginLeft="10dp"
                 android:layout_marginTop="10dp"
                 android:orientation="horizontal">
+
                 <ImageView
                     android:id="@+id/baseCurrencySymbol"
                     android:layout_width="25dp"
@@ -57,9 +56,10 @@
                     android:textSize="20sp" />
 
             </LinearLayout>
+
             <LinearLayout
                 android:id="@+id/linearlayout2"
-                android:layout_width="match_parent"
+                android:layout_width="wrap_content"
 
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/linearlayout1"
@@ -86,6 +86,7 @@
                     android:hint="@string/enter_btc_value"
                     android:inputType="numberDecimal"
                     android:padding="10dp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -101,8 +102,8 @@
 
             <LinearLayout
                 android:id="@+id/linearlayout3"
-                android:layout_width="match_parent"
-                 android:layout_height="wrap_content"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
                 android:layout_below="@+id/linearlayout2"
                 android:layout_marginBottom="10dp"
                 android:layout_marginLeft="10dp"
@@ -129,6 +130,7 @@
                     android:hint="@string/enter_eth_value"
                     android:inputType="numberDecimal"
                     android:padding="10dp" />
+
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
@@ -142,16 +144,30 @@
         </RelativeLayout>
     </android.support.v7.widget.CardView>
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/cardview"
-        android:layout_centerHorizontal="true"
-        android:layout_marginLeft="30dp"
-        android:layout_marginRight="30dp"
-        android:layout_marginTop="20dp"
-        android:text="@string/conversion_activity_int"
-        android:textColor="@android:color/black"
-        />
+    <RelativeLayout
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1">
 
-</RelativeLayout>
+        <include
+            android:id="@+id/include"
+            layout="@layout/item_currency_list" />
+        <TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@+id/include"
+            android:layout_centerHorizontal="true"
+            android:layout_marginLeft="30dp"
+            android:layout_marginRight="30dp"
+            android:layout_marginTop="20dp"
+            android:text="@string/conversion_activity_int"
+            android:textColor="@android:color/black"
+            />
+    </RelativeLayout>
+
+
+
+
+
+</LinearLayout>
