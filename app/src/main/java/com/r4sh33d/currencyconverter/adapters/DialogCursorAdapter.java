@@ -16,6 +16,7 @@ import com.r4sh33d.currencyconverter.database.CurrencyContract;
 
 /**
  * Created by rasheed on 10/27/17.
+ *
  */
 
 public class DialogCursorAdapter extends RecyclerView.Adapter<DialogCursorAdapter.MyHolder> {
