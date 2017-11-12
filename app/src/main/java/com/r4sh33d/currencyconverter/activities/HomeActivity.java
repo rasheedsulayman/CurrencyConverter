@@ -39,7 +39,6 @@ public class HomeActivity extends AppCompatActivity {
     private RecyclerView recyclerView;
     private FloatingActionButton fab;
     private CurrencyDBHelper currencyDBHelper;
-    private SQLiteDatabase database;
     private ArrayList<Currency> currencyArrayList = new ArrayList<>();
     private CoordinatorLayout coordinatorLayout;
     private HashMap<String, Integer> shortCodeFlagMap = new HashMap<>();
@@ -47,21 +46,22 @@ public class HomeActivity extends AppCompatActivity {
     private HashMap<String, String> codeCountryMap = new HashMap<>();
     private SharedPreferences sharedPreferences;
     private CurrencyListAdapter currencyListAdapter;
+    boolean isActivityRUnning = false;
+    ProgressDialog dialog;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_home);
+        isActivityRUnning = true;
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
         fab = (FloatingActionButton) findViewById(R.id.fabAddCurrency);
         coordinatorLayout = (CoordinatorLayout) findViewById(R.id.coordinatorLayout);
+        dialog = new ProgressDialog(this);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         currencyListAdapter = new CurrencyListAdapter(this, currencyArrayList);
         recyclerView.setAdapter(currencyListAdapter);
-
         currencyDBHelper = new CurrencyDBHelper(this);
-        database = currencyDBHelper.getWritableDatabase();// we still want to provide conversion without internet connection
-
         buildCurrencyDetailsMapsFromShortCodes();//This helps in associating local data with the conversion rates from the server
         sharedPreferences = getSharedPreferences(
                 Utils.SHARED_PREFERENCE_FILE_KEY, Context.MODE_PRIVATE);
@@ -83,10 +83,7 @@ public class HomeActivity extends AppCompatActivity {
             }
         });
     }
-
-
     private void getConversionRatesFromServer() {
-        final ProgressDialog dialog = new ProgressDialog(this);
         dialog.setIndeterminate(true);
         dialog.setMessage(getString(R.string.loading_conversion_ratio));
         dialog.setCancelable(false);
@@ -98,48 +95,53 @@ public class HomeActivity extends AppCompatActivity {
         call.enqueue(new Callback<String>() {
             @Override
             public void onResponse(Call<String> call, Response<String> response) {
-                //we have new data , drop the previous cached one
-                database.delete(CurrencyContract.TABLE_NAME, null, null);
-                JsonObject jsonObject = new JsonParser().parse(response.body()).getAsJsonObject();
-
-                if (jsonObject != null && jsonObject.has("BTC") && jsonObject.has("ETH")) {
-
-                    Set<String> shortCodeskeySet = jsonObject.getAsJsonObject("BTC").keySet();
-                    for (String shortCode : shortCodeskeySet) {
-                        ContentValues values = new ContentValues();
-                        values.put(CurrencyContract.COLUMN_COUNTRY_SHORT_CODE, shortCode);
-                        values.put(CurrencyContract.COLUMN_COUNTRY_NAME, codeCountryMap.get(shortCode));
-                        values.put(CurrencyContract.COLUMN_BTC_EQUIVALENT, jsonObject.getAsJsonObject("BTC").get(shortCode).getAsDouble());
-                        values.put(CurrencyContract.COLUMN_ETH_EQUIVALENT, jsonObject.getAsJsonObject("ETH").get(shortCode).getAsDouble());
-                        values.put(CurrencyContract.COLUMN_DIALOG_LABEL, codeCountryMap.get(shortCode) + " (" + shortCode + ")");
-
-                        if (shortCode.equals("NGN") || shortCode.equals("USD")
-                                || shortCode.equals("EUR")) {
-                            //The idea here is to have some pre-enabled currencies when opening the app for the first time .
-                            // so that we don't have an empty screen first time  we open the app
-                            values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
-                        } else {
-                            //get user's preference
-                            values.put(CurrencyContract.COLUMN_IS_ENABLED, sharedPreferences.getBoolean(shortCode, false) ? 1 : 0);
+                //The activity might have been destroyed before this method is called ,since we are not calling from main thread
+                //hence check if the activty is still active to avoid nullpointer Exceptions
+                if (isActivityRUnning) {
+                    JsonObject jsonObject = new JsonParser().parse(response.body()).getAsJsonObject();
+                    if (jsonObject != null && jsonObject.has("BTC") && jsonObject.has("ETH")) {
+                        SQLiteDatabase database = currencyDBHelper.getWritableDatabase();// we still want to provide conversion without internet connection
+                        //we have new data , drop the previous cached one
+                        database.delete(CurrencyContract.TABLE_NAME, null, null);
+                        Set<String> shortCodeskeySet = jsonObject.getAsJsonObject("BTC").keySet();
+                        for (String shortCode : shortCodeskeySet) {
+                            ContentValues values = new ContentValues();
+                            values.put(CurrencyContract.COLUMN_COUNTRY_SHORT_CODE, shortCode);
+                            values.put(CurrencyContract.COLUMN_COUNTRY_NAME, codeCountryMap.get(shortCode));
+                            values.put(CurrencyContract.COLUMN_BTC_EQUIVALENT, jsonObject.getAsJsonObject("BTC").get(shortCode).getAsDouble());
+                            values.put(CurrencyContract.COLUMN_ETH_EQUIVALENT, jsonObject.getAsJsonObject("ETH").get(shortCode).getAsDouble());
+                            values.put(CurrencyContract.COLUMN_DIALOG_LABEL, codeCountryMap.get(shortCode) + " (" + shortCode + ")");
+                            if (shortCode.equals("NGN") || shortCode.equals("USD")
+                                    || shortCode.equals("EUR")) {
+                                //The idea here is to have some pre-enabled currencies when opening the app for the first time .
+                                // so that we don't have an empty screen first time  we open the app
+                                values.put(CurrencyContract.COLUMN_IS_ENABLED, 1);
+                            } else {
+                                //get user's preference
+                                values.put(CurrencyContract.COLUMN_IS_ENABLED, sharedPreferences.getBoolean(shortCode, false) ? 1 : 0);
+                            }
+                            database.insert(CurrencyContract.TABLE_NAME, null, values);
                         }
-                        database.insert(CurrencyContract.TABLE_NAME, null, values);
+                        if (dialog != null && dialog.isShowing()) {
+                            dialog.dismiss();
+                        }
+                        refreshRecyclerViewItems();
+                        database.close();
+                    } else {
+                        showSnackBar(getString(R.string.something_went_wrong));
                     }
-                    dialog.dismiss();
-                    refreshRecyclerViewItems();
-                } else {
-                    showSnackBar(getString(R.string.something_went_wrong));
                 }
             }
-
             @Override
             public void onFailure(Call<String> call, Throwable t) {
-                dialog.dismiss();
+                if (dialog != null && dialog.isShowing()) {
+                    dialog.dismiss();
+                }
                 t.printStackTrace();
                 showSnackBar(getString(R.string.network_error));
             }
         });
     }
-
     void showSnackBar(String message) {
         Snackbar.make(coordinatorLayout, message, Snackbar.LENGTH_INDEFINITE).setAction("Retry", new View.OnClickListener() {
             @Override
@@ -150,29 +152,25 @@ public class HomeActivity extends AppCompatActivity {
     }
 
     public void refreshRecyclerViewItems() {
-
         currencyArrayList.clear();
+        SQLiteDatabase database = currencyDBHelper.getWritableDatabase();// we still want to provide conversion without internet connection
         currencyArrayList.addAll(Utils.getCurrencyList(Utils.makeConversionRatesCursor(database),
                 shortCodeFlagMap, shortCodeCurrencySymbolMap));
-
+        database.close();
         if (currencyArrayList.size() > 0) {
             //we have new data
             currencyListAdapter.notifyDataSetChanged();
-
         } else {
             //we are offline the first time of opening the app  or we have empty data from the server
             showSnackBar(getString(R.string.enable_internet));
         }
     }
 
-
     public void buildCurrencyDetailsMapsFromShortCodes() {
-
         String[] arrayOfCurrencyShortCodes = getResources().getStringArray(R.array.country_short_codes);
         String[] arrayOfCOuntryNames = getResources().getStringArray(R.array.country_names);
         TypedArray arrayOfFlags = getResources().obtainTypedArray(R.array.countryflags);
         TypedArray arrayOfSymbols = getResources().obtainTypedArray(R.array.currency_symbols);
-
         for (int i = 0; i < arrayOfCurrencyShortCodes.length; i++) {
             codeCountryMap.put(arrayOfCurrencyShortCodes[i], arrayOfCOuntryNames[i]);
             shortCodeFlagMap.put(arrayOfCurrencyShortCodes[i], arrayOfFlags.getResourceId(i, -1));
@@ -194,11 +192,12 @@ public class HomeActivity extends AppCompatActivity {
         result = stringBuilder.toString();
         return result.substring(0, result.length() - 1);
     }
-
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        database.close();
-
+        isActivityRUnning = false;
+        if (dialog != null && dialog.isShowing()) {
+            dialog.dismiss();
+        }
     }
 }
